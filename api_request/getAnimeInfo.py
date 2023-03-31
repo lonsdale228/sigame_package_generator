@@ -30,6 +30,7 @@ def getAnimeIds(est_num,username,shuffle=True):
     anime_num=0
     page=1
     while anime_num<est_num:
+
         data={
             "page":page,
             "limit":100,
@@ -37,9 +38,11 @@ def getAnimeIds(est_num,username,shuffle=True):
         }
         history = requests.get(f"{API_URL}users/{username}/history",params=data,headers=headers).json()
         print(len(history))
+        if len(history)==0:
+            break
         for i in history:
             if "Просмотрено" in i['description']:
-                anime_list.append(animClass(id=i['target']['id'],name=i['target']['name'],name_rus=i['target']['russian'],anime_score=i['target']['score'],poster=i['target']['image']['original'],user_score=get_user_score(i['description'])))
+                anime_list.append(animClass(id=i['target']['id'],name=i['target']['name'],name_rus=i['target']['russian'],anime_score=i['target']['score'],poster=i['target']['image']['original'],user_score=get_user_score(i['description'])  ))
                 anime_num += 1
         page+=1
 
@@ -47,21 +50,49 @@ def getAnimeIds(est_num,username,shuffle=True):
     anime_list=anime_list[0:est_num]
     return anime_list
 
-def getScreenshot(animes):
+
+
+
+def getAnimeInfo(animes):
     end=len(animes)
     progress=0
     for anime in animes:
         try:
-            anime.screenshot = random.choice(requests.get(f"{API_URL}animes/{anime.id}/screenshots",headers=headers).json())['original']
+            animeInfo=requests.get(f"{API_URL}animes/{anime.id}",headers=headers).json()
+            #anime.screenshot = random.choice(requests.get(f"{API_URL}animes/{anime.id}/screenshots",headers=headers).json())['original']
+            anime.screenshot = random.choice(animeInfo["screenshots"])['original']
+            anime.kind=animeInfo["kind"]
+            anime.franchise=animeInfo["franchise"]
+
             print(anime.screenshot)
         except requests.exceptions.HTTPError:
             time.sleep(20)
             print("API Request reached, waiting....")
-            anime.screenshot = random.choice(requests.get(f"{API_URL}animes/{anime.id}/screenshots",headers=headers).json())['original']
+            animeInfo = requests.get(f"{API_URL}animes/{anime.id}", headers=headers).json()
+            anime.screenshot = random.choice(animeInfo["screenshots"])['original']
+            anime.kind = animeInfo["kind"]
+            anime.franchise = animeInfo["franchise"]
         except IndexError:
             ...
         progress+=1
-        print(f'Getting screenshots {progress}/{end}')
+        print(f'Getting anime infos {progress}/{end}')
 
         time.sleep(0.6) #avoid api limit
-    download_screenshots(animes)
+# def getScreenshot(animes):
+#     end=len(animes)
+#     progress=0
+#     for anime in animes:
+#         try:
+#             anime.screenshot = random.choice(requests.get(f"{API_URL}animes/{anime.id}/screenshots",headers=headers).json())['original']
+#             print(anime.screenshot)
+#         except requests.exceptions.HTTPError:
+#             time.sleep(20)
+#             print("API Request reached, waiting....")
+#             anime.screenshot = random.choice(requests.get(f"{API_URL}animes/{anime.id}/screenshots",headers=headers).json())['original']
+#         except IndexError:
+#             ...
+#         progress+=1
+#         print(f'Getting screenshots {progress}/{end}')
+#
+#         time.sleep(0.6) #avoid api limit
+#     download_screenshots(animes)
