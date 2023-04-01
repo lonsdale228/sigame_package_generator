@@ -5,11 +5,14 @@ from create_package.create_package import create_package, clear_trash
 from create_package.transfer_content import transfer_audio
 from downloader.download import download_screenshots
 from generate.generate_content import create_audio_line, create_round, create_xml_round, create_xml, create_scr_round
+from src.generate import create_dirs
 
 AUDIO_DURATION=30
 
 if __name__=="__main__":
-    #clear_trash()
+    clear_trash()
+    create_dirs()
+
     animes=getAnimeIds(5,"lonsdale651")
     ids=[]
     for i in animes:
@@ -18,12 +21,9 @@ if __name__=="__main__":
     print(ids)
 
 
-    downloader.download(animes,10)
-    curDir=os.getcwd()
-    os.mkdir(f"{curDir}\\create_package\\temp")
-    os.mkdir(f"{curDir}\\create_package\\temp\\Audio")
-    os.mkdir(f"{curDir}\\create_package\\temp\\Images")
-    os.mkdir(f"{curDir}\\create_package\\temp\\Video")
+    downloader.download(animes,AUDIO_DURATION)
+
+
     #round=create_round(animes)
     #getScreenshot(animes)
 
@@ -42,7 +42,7 @@ if __name__=="__main__":
 
     transfer_audio()
     create_package()
-    clear_trash()
+
 
 
 
@@ -54,3 +54,5 @@ if __name__=="__main__":
 
     # for i in animes:
     #     print(i.hex_name)
+
+    clear_trash()

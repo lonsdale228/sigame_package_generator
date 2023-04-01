@@ -4,9 +4,10 @@ import re
 
 import requests
 
-from downloader.download import download_screenshots
-from entities.anime import anime as animClass
+# from downloader.download import download_screenshots
+# import download_screenshots
 
+from src.entities.anime import anime as animClass
 
 API_URL="https://shikimori.one/api/"
 

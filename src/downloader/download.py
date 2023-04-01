@@ -15,8 +15,8 @@ NUM_OF_THREADS=30
 
 
 def scr_download(anime):
-    urllib.request.urlretrieve(f"https://shikimori.one{anime.screenshot}", f"create_package\\temp\\Images\\{anime.hex_name}.jpg")
-    print(f"https://shikimori.one{anime.screenshot}", f"create_package\\temp\\Images\\{anime.hex_name}.jpg")
+    urllib.request.urlretrieve(f"https://shikimori.one{anime.screenshot}", f"temp\\Images\\{anime.hex_name}.jpg")
+    print(f"https://shikimori.one{anime.screenshot}", f"temp\\Images\\{anime.hex_name}.jpg")
 def download_screenshots(animes):
     thread_list = []
     for anime in animes:
@@ -55,7 +55,7 @@ def download_audio(anime, duration):
     YoutubeDL(ydl_opts).download(url)
 
 
-def download(anime_list,duration):
+def download(anime_list,duration:int):
 
     if type(anime_list)==dict:
         anime_list=anime_list.values()

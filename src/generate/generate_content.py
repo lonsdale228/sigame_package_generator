@@ -1,6 +1,8 @@
 import os
 import secrets
 import xml.etree.ElementTree as ET
+from src.entities.rounds import question,line
+
 
 m_encoding = 'UTF-8'
 
@@ -38,8 +40,6 @@ for i in range(rounds_num):
 
 
 def create_screenshot_line(animes,limit=15):
-    from entities.rounds import question
-    from entities.rounds import line
 
     temp_line = line()
     temp_line.questions = []
@@ -63,8 +63,6 @@ def create_screenshot_line(animes,limit=15):
 
 
 def create_audio_line(animes,limit=15,start=1):
-    from entities.rounds import question
-    from entities.rounds import line
 
     temp_line = line()
     temp_line.questions=[]
@@ -87,7 +85,7 @@ def create_audio_line(animes,limit=15,start=1):
     return temp_line
 
 def create_scr_round(animes,limit=10):
-    from entities.rounds import round
+    from src.entities.rounds import round
     temp_round=round()
     temp_round.lines=[]
 
@@ -98,7 +96,7 @@ def create_scr_round(animes,limit=10):
 
 
 def create_round(animes,limit=10):
-    from entities.rounds import round
+    from src.entities.rounds import round
     temp_round=round()
     temp_round.lines=[]
 
@@ -146,7 +144,7 @@ def create_xml(xml_round):
     rounds = ET.SubElement(root, "rounds")
     rounds.append(xml_round)
     tree = ET.ElementTree(root)
-    tree.write(os.getcwd()+"\create_package\\temp\\"+"content.xml", encoding="utf-8", xml_declaration=True)
+    tree.write("temp\\"+"content.xml", encoding="utf-8", xml_declaration=True)
 
 
 
