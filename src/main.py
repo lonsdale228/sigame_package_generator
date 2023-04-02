@@ -9,11 +9,17 @@ from src.generate import create_dirs
 
 AUDIO_DURATION=30
 
+#video\audio\screenshots
+ANIME_COUNT=15
+
+#max animes count from api
+GET_ANIME_MAX=500
+
 if __name__=="__main__":
     clear_trash()
     create_dirs()
 
-    animes=getAnimeIds(5,"lonsdale651")
+    animes=getAnimeIds(GET_ANIME_MAX,"lonsdale651")
     ids=[]
     for i in animes:
         print(i.name)
@@ -21,7 +27,7 @@ if __name__=="__main__":
     print(ids)
 
 
-    downloader.download(animes,AUDIO_DURATION)
+    downloader.download(animes,AUDIO_DURATION,ANIME_COUNT)
 
 
     #round=create_round(animes)

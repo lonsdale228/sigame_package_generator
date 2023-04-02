@@ -27,7 +27,6 @@ def get_anime_desc(api,animes):
 headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
 def getAnimeIds(est_num,username,shuffle=True):
     anime_list=[]
-
     anime_num=0
     page=1
     while anime_num<est_num:
@@ -48,7 +47,7 @@ def getAnimeIds(est_num,username,shuffle=True):
         page+=1
 
     if shuffle: random.shuffle(anime_list)
-    anime_list=anime_list[0:est_num]
+    anime_list=anime_list[:est_num]
     return anime_list
 
 
