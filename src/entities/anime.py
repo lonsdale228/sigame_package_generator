@@ -11,3 +11,4 @@ class anime:
         self.description=description
         self.kind=kind
         self.franchise=franchise
+    

@@ -5,6 +5,7 @@ from create_package.create_package import create_package, clear_trash
 from create_package.transfer_content import transfer_audio
 from downloader.download import download_screenshots
 from generate.generate_content import create_audio_line, create_round, create_xml_round, create_xml, create_scr_round
+from src.api_request.setAnimeCode import set_anime_code
 from src.generate import create_dirs
 
 AUDIO_DURATION=30
@@ -13,19 +14,32 @@ AUDIO_DURATION=30
 ANIME_COUNT=15
 
 #max animes count from api
-GET_ANIME_MAX=500
+GET_ANIME_MAX=15
+
+NICKNAME="lonsdale651"
 
 if __name__=="__main__":
     clear_trash()
     create_dirs()
 
-    animes=getAnimeIds(GET_ANIME_MAX,"lonsdale651")
+
+
+    animes=getAnimeIds(GET_ANIME_MAX,NICKNAME)
     ids=[]
     for i in animes:
         print(i.name)
         ids.append(i.id)
     print(ids)
 
+    set_anime_code(animes)
+
+    getAnimeInfo(animes)
+
+    uniq_anim = {}
+    for anime in animes:
+        uniq_anim[f"{anime.franchise}"] = anime.id
+
+    print(uniq_anim)
 
     downloader.download(animes,AUDIO_DURATION,ANIME_COUNT)
 
@@ -33,7 +47,7 @@ if __name__=="__main__":
     #round=create_round(animes)
     #getScreenshot(animes)
 
-    getAnimeInfo(animes)
+
     download_screenshots(animes)
 
     for i in animes:

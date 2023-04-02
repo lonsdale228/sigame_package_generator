@@ -37,9 +37,6 @@ def download_audio(anime, duration):
     videosSearch = VideosSearch(name+" anime opening", limit=1)
     url = videosSearch.result()["result"][-1]['link']
 
-    gen_name=secrets.token_hex(16)
-    anime.hex_name=gen_name
-
     ydl_opts = {
         'format': 'm4a/bestaudio/best',
         # ️ℹ See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
@@ -49,7 +46,7 @@ def download_audio(anime, duration):
             'preferredquality': '192'
         }],
         'postprocessor_args': ['-ss', '00:00:00','-t',f'{duration}','-c:a','aac','-b:a','192k'],
-        'outtmpl': f'downloader/%(extractor_key)s/{gen_name}.%(ext)s'
+        'outtmpl': f'downloader/%(extractor_key)s/{anime.hex_name}.%(ext)s'
     }
 
     YoutubeDL(ydl_opts).download(url)
