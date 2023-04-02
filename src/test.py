@@ -9,7 +9,7 @@ from random_user_agent.params import SoftwareName, OperatingSystem
 import requests
 import requests_random_user_agent
 #headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'},headers=headers
-req=requests.get("https://shikimori.one/api/animes/52168/screenshots").json()['original']
+req=requests.get("https://shikimori.one/api/animes/52168/screenshots").json()[0]['original']
 
 software_names = [SoftwareName.CHROME.value]
 operating_systems = [OperatingSystem.WINDOWS.value, OperatingSystem.LINUX.value]
@@ -18,7 +18,7 @@ user_agent_rotator = UserAgent(software_names=software_names, operating_systems=
 # user_agents = user_agent_rotator.get_user_agents()
 API_URL="https://shikimori.one/api/"
 headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
-screenshot = requests.get(f"{API_URL}animes/{32542}/screenshots",headers=headers).json()['original']
+screenshot = requests.get(f"{API_URL}animes/{32542}/screenshots",headers=headers).json()[0]['original']
 print(screenshot)
 
 

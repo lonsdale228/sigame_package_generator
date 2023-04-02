@@ -52,7 +52,7 @@ def download_audio(anime, duration):
     YoutubeDL(ydl_opts).download(url)
 
 
-def download(anime_list,duration:int,count:int):
+def download_videos(anime_list,duration:int,count:int):
     anime_list=anime_list[:count]
     if type(anime_list)==dict:
         anime_list=anime_list.values()

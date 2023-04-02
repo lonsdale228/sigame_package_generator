@@ -118,7 +118,7 @@ def create_xml_round(round,type):
             xml_atom_type=ET.SubElement(xml_scenario,"atom",type=f"{question.type}")
             match type:
                 case "audio":
-                    xml_atom_type.text="@"+question.hex+".m4a"
+                    xml_atom_type.text="@"+question.hex+".mp3"
                 case "image":
                     xml_atom_type.text = "@" + question.hex + ".jpg"
                 case "video":
