@@ -88,7 +88,7 @@ def create_scr_round(animes,limit=10):
     from src.entities.rounds import round
     temp_round=round()
     temp_round.lines=[]
-
+    temp_round.name="Screenshots"
     for i in range(limit):
         temp_round.lines.append(create_screenshot_line(animes))
         temp_round.lines[i].name=f"Screenshot {i+1}"
@@ -99,7 +99,7 @@ def create_round(animes,limit=10):
     from src.entities.rounds import round
     temp_round=round()
     temp_round.lines=[]
-
+    temp_round.name="Openings"
     for i in range(limit):
         temp_round.lines.append(create_audio_line(animes))
         temp_round.lines[i].name=f"OP {i+1}"
@@ -110,26 +110,27 @@ def create_xml_round(round,type):
     xml_round=ET.Element("round",name=round.name)
     xml_themes=ET.SubElement(xml_round,"themes")
     for line in round.lines:
-        xml_line=ET.SubElement(xml_themes,"theme",name=line.name)
-        xml_questions=ET.SubElement(xml_line,"questions")
-        for question in line.questions:
-            xml_que=ET.SubElement(xml_questions,"question",price=f"{question.price}")
-            xml_scenario=ET.SubElement(xml_que,"scenario")
-            xml_atom_type=ET.SubElement(xml_scenario,"atom",type=f"{question.type}")
-            match type:
-                case "audio":
-                    xml_atom_type.text="@"+question.hex+".mp3"
-                case "image":
-                    xml_atom_type.text = "@" + question.hex + ".jpg"
-                case "video":
-                    xml_atom_type.text = "@" + question.hex + ".mp4"
-            xml_right=ET.SubElement(xml_que,"right")
-            xml_answer=ET.SubElement(xml_right,"answer")
-            xml_answer.text=question.answer
+        if line.questions:
+            xml_line=ET.SubElement(xml_themes,"theme",name=line.name)
+            xml_questions=ET.SubElement(xml_line,"questions")
+            for question in line.questions:
+                xml_que=ET.SubElement(xml_questions,"question",price=f"{question.price}")
+                xml_scenario=ET.SubElement(xml_que,"scenario")
+                xml_atom_type=ET.SubElement(xml_scenario,"atom",type=f"{question.type}")
+                match type:
+                    case "audio":
+                        xml_atom_type.text="@"+question.hex+".m4a"
+                    case "image":
+                        xml_atom_type.text = "@" + question.hex + ".jpg"
+                    case "video":
+                        xml_atom_type.text = "@" + question.hex + ".mp4"
+                xml_right=ET.SubElement(xml_que,"right")
+                xml_answer=ET.SubElement(xml_right,"answer")
+                xml_answer.text=question.answer
     return xml_round
 
 
-def create_xml(xml_round):
+def create_xml(xml_round_list:list):
     package_name="Test"
     package_id=secrets.token_hex(16)
     root = ET.Element("package", {
@@ -142,8 +143,10 @@ def create_xml(xml_round):
         "xmlns": "http://vladimirkhil.com/ygpackage3.0.xsd"
     })
     rounds = ET.SubElement(root, "rounds")
-    rounds.append(xml_round)
+    for round in xml_round_list:
+        rounds.append(round)
     tree = ET.ElementTree(root)
+
     tree.write("temp\\"+"content.xml", encoding="utf-8", xml_declaration=True)
 
 

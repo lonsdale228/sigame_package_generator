@@ -3,6 +3,8 @@ import time
 import re
 
 import requests
+from fake_useragent import UserAgent
+ua = UserAgent()
 
 # from downloader.download import download_screenshots
 # import download_screenshots
@@ -10,6 +12,13 @@ import requests
 from src.entities.anime import anime as animClass
 
 API_URL="https://shikimori.one/api/"
+
+
+
+def get_genres():
+    user_agent = {'User-Agent': f'{ua.random}'}
+    return [genre["name"] for genre in requests.get("https://shikimori.one/api/genres",headers=user_agent,timeout=5).json() if genre["kind"]=="anime"]
+
 
 def get_user_score(desc):
     pattern = re.compile(r'>\s*(\d+)\s*<')
@@ -21,7 +30,7 @@ def get_user_score(desc):
         return ""
 
 #TODO
-def get_anime_desc(api,animes):
+def get_anime_desc(anime_list:list):
     ...
 
 headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
@@ -51,19 +60,33 @@ def getAnimeIds(est_num,username,shuffle=True):
     return anime_list
 
 
+def remove_duplicates(anime_list:list):
+    uniq_anim = {}
+    sorted_list=[]
+    for anime in anime_list:
+        if anime.franchise==None:
+            uniq_anim[f"{anime.name.replace(' ','_').lower()}"] = anime.id
+        else:
+            uniq_anim[f"{anime.franchise}"] = anime.id
 
+    for anime in anime_list:
+        if anime.id in uniq_anim.values():
+            sorted_list.append(anime)
+    return sorted_list
 
-def getAnimeInfo(animes):
-    end=len(animes)
+def getAnimeInfo(anime_list:list,allow_duplicates:bool):
+    end=len(anime_list)
     progress=0
-    for anime in animes:
+    for anime in anime_list:
         try:
             animeInfo=requests.get(f"{API_URL}animes/{anime.id}",headers=headers).json()
             #anime.screenshot = random.choice(requests.get(f"{API_URL}animes/{anime.id}/screenshots",headers=headers).json())['original']
             anime.screenshot = random.choice(animeInfo["screenshots"])['original']
             anime.kind=animeInfo["kind"]
             anime.franchise=animeInfo["franchise"]
-
+            anime.genres=[genre["name"] for genre in animeInfo["genres"]]
+            print(anime.id,anime.genres)
+            print(anime.franchise)
             print(anime.screenshot)
         except requests.exceptions.HTTPError:
             time.sleep(20)
@@ -78,21 +101,6 @@ def getAnimeInfo(animes):
         print(f'Getting anime infos {progress}/{end}')
 
         time.sleep(0.6) #avoid api limit
-# def getScreenshot(animes):
-#     end=len(animes)
-#     progress=0
-#     for anime in animes:
-#         try:
-#             anime.screenshot = random.choice(requests.get(f"{API_URL}animes/{anime.id}/screenshots",headers=headers).json())['original']
-#             print(anime.screenshot)
-#         except requests.exceptions.HTTPError:
-#             time.sleep(20)
-#             print("API Request reached, waiting....")
-#             anime.screenshot = random.choice(requests.get(f"{API_URL}animes/{anime.id}/screenshots",headers=headers).json())['original']
-#         except IndexError:
-#             ...
-#         progress+=1
-#         print(f'Getting screenshots {progress}/{end}')
-#
-#         time.sleep(0.6) #avoid api limit
-#     download_screenshots(animes)
+
+    if not allow_duplicates:
+        anime_list=remove_duplicates(anime_list)
