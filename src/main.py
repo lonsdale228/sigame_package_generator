@@ -12,10 +12,10 @@ from src.optimizer.sort_anime import sort_by_genres
 AUDIO_DURATION=30
 
 #video\audio\screenshots
-ANIME_COUNT=200
+ANIME_COUNT=150
 
 #max animes count from api
-GET_ANIME_MAX=200
+GET_ANIME_MAX=620
 
 DOWNLOAD_SCREENSHOTS=True
 DOWNLOAD_AUDIO=True
@@ -29,7 +29,7 @@ if __name__=="__main__":
 
     genres=get_genres()
     print(genres)
-    anime_list=getAnimeIds(GET_ANIME_MAX,"lonsdale651")
+    anime_list=getAnimeIds(GET_ANIME_MAX,"ВикторШнюк")
     ids=[]
     for anime in anime_list:
         print(anime.name)
@@ -38,10 +38,10 @@ if __name__=="__main__":
 
     set_anime_code(anime_list)
 
-    getAnimeInfo(anime_list,allow_duplicates=False)
+    getAnimeInfo(anime_list,False)
 
 
-    req_genres=['Drama']
+    req_genres=['Game','Psychological','Adventure','Comedy','Action','Shoujo Ai','Shounen Ai']
 
     anime_list=sort_by_genres(anime_list,req_genres)
 

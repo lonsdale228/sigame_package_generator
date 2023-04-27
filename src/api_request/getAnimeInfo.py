@@ -11,13 +11,13 @@ ua = UserAgent()
 
 from src.entities.anime import anime as animClass
 
-API_URL="https://shikimori.one/api/"
+API_URL="https://shikimori.me/api/"
 
 
 
 def get_genres():
     user_agent = {'User-Agent': f'{ua.random}'}
-    return [genre["name"] for genre in requests.get("https://shikimori.one/api/genres",headers=user_agent,timeout=5).json() if genre["kind"]=="anime"]
+    return [genre["name"] for genre in requests.get("https://shikimori.me/api/genres",headers=user_agent,timeout=5).json() if genre["kind"]=="anime"]
 
 
 def get_user_score(desc):
@@ -33,7 +33,7 @@ def get_user_score(desc):
 def get_anime_desc(anime_list:list):
     ...
 
-headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+headers = {'User-Agent': f'{ua.random}'}
 def getAnimeIds(est_num,username,shuffle=True):
     anime_list=[]
     anime_num=0
@@ -70,7 +70,7 @@ def remove_duplicates(anime_list:list):
             uniq_anim[f"{anime.franchise}"] = anime.id
 
     for anime in anime_list:
-        if anime.id in uniq_anim.values():
+        if (anime.id in uniq_anim.values()) and (not anime.id in sorted_list):
             sorted_list.append(anime)
     return sorted_list
 

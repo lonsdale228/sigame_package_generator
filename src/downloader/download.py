@@ -2,6 +2,7 @@ import os
 import threading
 import time
 
+import requests
 from pytube import YouTube
 from youtubesearchpython import VideosSearch
 import secrets
@@ -9,14 +10,27 @@ import ffmpeg
 import subprocess
 from yt_dlp import YoutubeDL
 import urllib.request
-
+from fake_useragent import UserAgent
+ua = UserAgent()
 
 NUM_OF_THREADS=30
 
 
 def scr_download(anime):
-    urllib.request.urlretrieve(f"https://shikimori.one{anime.screenshot}", f"temp\\Images\\{anime.hex_name}.jpg")
-    print(f"https://shikimori.one{anime.screenshot}", f"temp\\Images\\{anime.hex_name}.jpg")
+    try:
+        headers = {'User-Agent': f'{ua.random}'}
+        response = requests.get(f"https://shikimori.me{anime.screenshot}", headers=headers, stream=True)
+        response.raise_for_status()
+
+        filename=f"temp\\Images\\{anime.hex_name}.jpg"
+        with open(filename, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        print(f"Image saved as {filename}")
+        #print(f"https://shikimori.me{anime.screenshot}", f"temp\\Images\\{anime.hex_name}.jpg")
+    except requests.exceptions.HTTPError:
+        scr_download(anime)
+
 def download_screenshots(animes):
     thread_list = []
     for anime in animes:
