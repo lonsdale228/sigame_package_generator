@@ -46,12 +46,20 @@ def getAnimeIds(est_num,username,shuffle=True):
             "target_type":"Anime"
         }
         history = requests.get(f"{API_URL}users/{username}/history",params=data,headers=headers).json()
+        print(history)
         print(len(history))
         if len(history)==0:
             break
         for i in history:
             if "Просмотрено" in i['description']:
-                anime_list.append(animClass(id=i['target']['id'],name=i['target']['name'],name_rus=i['target']['russian'],anime_score=i['target']['score'],poster=i['target']['image']['original'],user_score=get_user_score(i['description'])  ))
+                anime_list.append(animClass(
+                    id=i['target']['id'],
+                    name=i['target']['name'],
+                    name_rus=i['target']['russian'],
+                    anime_score=i['target']['score'],
+                    poster=i['target']['image']['original'],
+                    user_score=get_user_score(i['description'])
+                ))
                 anime_num += 1
         page+=1
 
@@ -102,5 +110,5 @@ def getAnimeInfo(anime_list:list,allow_duplicates:bool):
 
         time.sleep(0.6) #avoid api limit
 
-    if not allow_duplicates:
-        anime_list=remove_duplicates(anime_list)
+    # if not allow_duplicates:
+    #     anime_list=remove_duplicates(anime_list)
