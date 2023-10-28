@@ -19,13 +19,17 @@ NUM_OF_THREADS=30
 def scr_download(anime):
     try:
         headers = {'User-Agent': f'{ua.random}'}
+        print(f"https://shikimori.me{anime.screenshot}")
         response = requests.get(f"https://shikimori.me{anime.screenshot}", headers=headers, stream=True)
         response.raise_for_status()
 
+        print(f"https://shikimori.me{anime.screenshot}")
         filename=f"temp\\Images\\{anime.hex_name}.jpg"
         with open(filename, 'wb') as f:
             for chunk in response.iter_content(chunk_size=8192):
                 f.write(chunk)
+
+
         print(f"Image saved as {filename}")
         #print(f"https://shikimori.me{anime.screenshot}", f"temp\\Images\\{anime.hex_name}.jpg")
     except requests.exceptions.HTTPError:
@@ -33,6 +37,11 @@ def scr_download(anime):
 
 def download_screenshots(animes):
     thread_list = []
+
+    for anime in animes:
+
+        print("amogus: ",anime.screenshot)
+
     for anime in animes:
         # print(anime.name)
         # print("Proccesing " + anime.name)

@@ -35,7 +35,9 @@ def main(settings:Generate):
     file = open('anime_dict10000.txt', 'rb')
     anime_dump=pickle.load(file)
     file.close()
-
+    # print(anime_dump)
+    # for i,j in anime_dump.items():
+    #     print("bebaasa: ",j.screenshot)
 
 
     # try:
@@ -52,15 +54,22 @@ def main(settings:Generate):
     for anime in anime_list:
         try:
             anime=anime_dump[f'{anime.id}']
-        except KeyError:
-            getting_list.append(anime)
+            print("test1: ",anime.screenshot)
+        except Exception as e:
+            print('error: ',e)
+            # getting_list.append(anime)
 
+    for anime in anime_list:
+        print("amoguuus: ",anime.screenshot)
 
     set_anime_code(anime_list)
 
     getAnimeInfo(getting_list, REMOVE_FRANCHISE_REPEAT)
 
     anime_list=anime_list+getting_list
+
+    for anime in anime_list:
+        print("boba: ", anime.screenshot)
 
     anime_list=remove_duplicates(anime_list)
 
