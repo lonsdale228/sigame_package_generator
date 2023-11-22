@@ -46,7 +46,7 @@ def getAnimeIds(est_num,username,shuffle=True):
             "target_type":"Anime"
         }
         history = requests.get(f"{API_URL}users/{username}/history",params=data,headers=headers).json()
-        print(history)
+        # print(history)
         print(len(history))
         if len(history)==0:
             break
@@ -82,25 +82,32 @@ def remove_duplicates(anime_list:list):
             sorted_list.append(anime)
     return sorted_list
 
-def getAnimeInfo(anime_list:list,allow_duplicates:bool):
+def get_anime_info(anime_list:list,allow_duplicates:bool):
     end=len(anime_list)
     progress=0
     for anime in anime_list:
         try:
             animeInfo=requests.get(f"{API_URL}animes/{anime.id}",headers=headers).json()
             #anime.screenshot = random.choice(requests.get(f"{API_URL}animes/{anime.id}/screenshots",headers=headers).json())['original']
-            anime.screenshot = random.choice(animeInfo["screenshots"])['original']
+            scr_url=random.choice(animeInfo["screenshots"])['original']
+            result = re.search(r'[^/]+(?=\.)', scr_url)
+            anime.screenshot = [result.group()]
+            # print("result group:", anime.screenshot)
             anime.kind=animeInfo["kind"]
             anime.franchise=animeInfo["franchise"]
             anime.genres=[genre["name"] for genre in animeInfo["genres"]]
-            print(anime.id,anime.genres)
-            print(anime.franchise)
-            print(anime.screenshot)
+            # print(anime.id,anime.genres)
+            # print(anime.franchise)
+            # print(anime.screenshot)
         except requests.exceptions.HTTPError:
             time.sleep(20)
             print("API Request reached, waiting....")
             animeInfo = requests.get(f"{API_URL}animes/{anime.id}", headers=headers).json()
-            anime.screenshot = random.choice(animeInfo["screenshots"])['original']
+            scr_url = random.choice(animeInfo["screenshots"])['original']
+            result = re.search(r'[^/]+(?=\.)', scr_url)
+            anime.screenshot = [result.group()]
+            # print("result group:", anime.screenshot)
+
             anime.kind = animeInfo["kind"]
             anime.franchise = animeInfo["franchise"]
         except IndexError:

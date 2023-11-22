@@ -5,7 +5,7 @@ class Generate():
     num_of_total:int=None
     op_duration:int=None
     downloading_thread:int=None
-
+    progress_bar:int=None
     nickname:str=""
 
     selected_genres:list[str] = None

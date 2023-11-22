@@ -13,17 +13,17 @@ from main import main
 from entities.anime import anime as animClass
 genres=sorted(['Drama', 'Game', 'Psychological', 'Adventure', 'Music', 'Gourmet', 'Action', 'Comedy', 'Demons', 'Police', 'Space', 'Ecchi', 'Fantasy', 'Hentai', 'Historical', 'Horror', 'Magic', 'Mecha', 'Parody', 'Samurai', 'Romance', 'School', 'Erotica', 'Shounen', 'Vampire', 'Yaoi', 'Yuri', 'Harem', 'Slice of Life', 'Shoujo Ai', 'Josei', 'Supernatural', 'Thriller', 'Sci-Fi', 'Shoujo', 'Super Power', 'Military', 'Mystery', 'Kids', 'Cars', 'Martial Arts', 'Dementia', 'Sports', 'Work Life', 'Seinen', 'Shounen Ai'])
 
-
 class Window(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
         self.ui = Ui_MainWindow()
-
         self.btnGenerate.clicked.connect(self.on_btn_click)
         self.threads_slider.valueChanged.connect(self.show_value)
     def change_content(self):
         self.listGenres.addItems(genres)
+    def set_progress(self,value):
+        self.progressBar.setValue(value)
     def on_btn_click(self):
         try:
             settings = Generate()
@@ -32,6 +32,7 @@ class Window(QMainWindow, Ui_MainWindow):
                 s.num_of_total=int(self.edTotalNum.text())
                 s.op_duration=int(self.edOPDuration.text())
                 s.downloading_thread=int(self.threads_slider.value())
+                s.progress_bar=int(self.progressBar.value())
 
                 s.nickname=self.edNickname.text()
 
@@ -61,7 +62,7 @@ class Window(QMainWindow, Ui_MainWindow):
         except Exception as e:
             print("Boba: ",e)
 
-        beba=threading.Thread(target=main,args=(settings,))
+        beba=threading.Thread(target=main,args=(settings,win))
         beba.start()
         ...
     def show_value(self):
