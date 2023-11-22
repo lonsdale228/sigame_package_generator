@@ -3,11 +3,8 @@ import time
 import re
 
 import requests
-from fake_useragent import UserAgent
-ua = UserAgent()
 
-# from downloader.download import download_screenshots
-# import download_screenshots
+from src.downloader.fake_ua import random_ua
 
 from src.entities.anime import anime as animClass
 
@@ -16,7 +13,8 @@ API_URL="https://shikimori.me/api/"
 
 
 def get_genres():
-    user_agent = {'User-Agent': f'{ua.random}'}
+    user_agent = {'User-Agent': f'{random_ua}'}
+    # user_agent = {'User-Agent': f'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'}
     return [genre["name"] for genre in requests.get("https://shikimori.me/api/genres",headers=user_agent,timeout=5).json() if genre["kind"]=="anime"]
 
 
@@ -33,7 +31,8 @@ def get_user_score(desc):
 def get_anime_desc(anime_list:list):
     ...
 
-headers = {'User-Agent': f'{ua.random}'}
+headers = {'User-Agent': f'{random_ua}'}
+# headers = {'User-Agent': f'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'}
 def getAnimeIds(est_num,username,shuffle=True):
     anime_list=[]
     anime_num=0

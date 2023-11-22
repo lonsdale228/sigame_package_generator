@@ -9,8 +9,21 @@ from generate.generate_content import create_round, create_xml_round, create_xml
 from src.api_request.setAnimeCode import set_anime_code
 from src.generate import create_dirs
 from entities.generate import Generate
+from src.optimizer.normalize_volume import normalize_audio
 from src.optimizer.sort_anime import sort_by_genres, force_sort_by_genres
 
+def resource_path(relative_path):
+    import os
+    import sys
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 def main(settings:Generate,win):
 
@@ -29,7 +42,8 @@ def main(settings:Generate,win):
     clear_trash()
     create_dirs()
 
-    file = open('anime_dict10000_v2.txt', 'rb')
+    # file = open('anime_dict10000_v2.txt', 'rb')
+    file = open(resource_path('anime_dict10000_v2.txt'), 'rb')
     anime_dump=pickle.load(file)
     file.close()
 
@@ -47,11 +61,8 @@ def main(settings:Generate,win):
         if anime.id not in anime_dump:
             getting_list.append(anime)
 
-    for i in getting_list:
-        print(i.id,i.name)
 
     get_anime_info(getting_list, REMOVE_FRANCHISE_REPEAT)
-
 
 
     for i in range(len(anime_list)):
@@ -61,11 +72,10 @@ def main(settings:Generate,win):
         except Exception as e:
             print('error: ',e)
 
-    anime_list = anime_list + getting_list
     set_anime_code(anime_list)
 
 
-
+    anime_list=anime_list+getting_list
 
 
     anime_list=remove_duplicates(anime_list)
@@ -89,8 +99,10 @@ def main(settings:Generate,win):
 
     if DOWNLOAD_AUDIO:
         download_videos(anime_list, AUDIO_DURATION)
+        # normalize_audio()
         round_audio = create_round(anime_list[:])
         round_list.append(create_xml_round(round_audio, "audio"))
+
     if DOWNLOAD_SCREENSHOTS:
         asyncio.run(download_screenshots(anime_list))
         round_scr = create_scr_round(anime_list[:])

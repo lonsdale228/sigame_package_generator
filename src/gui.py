@@ -8,6 +8,7 @@ from PyQt6.uic import loadUi
 
 from MainWindow import Ui_MainWindow
 from entities.generate import Generate
+
 from main import main
 
 from entities.anime import anime as animClass
