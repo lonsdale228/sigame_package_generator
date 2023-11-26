@@ -15,7 +15,7 @@ class animClass:
         self.franchise=franchise
         self.genres=[]
 
-file=open('anime_dump10000.txt','rb')
+file=open('anime_dict10000.txt','rb')
 
 anime_list=pickle.load(file)
 
@@ -26,10 +26,10 @@ file.close()
 
 
 anime_dict={}
-for anime in anime_list:
-    anime_dict[f'{anime.id}']=anime
+for id,anime in anime_list.items():
+    anime_dict[int(id)]=anime
 
 
-file=open('anime_dict10000.txt','wb')
+file=open('anime_dict10000_v2.txt','wb')
 pickle.dump(anime_dict,file)
 file.close()
