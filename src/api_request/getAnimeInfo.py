@@ -6,16 +6,18 @@ import requests
 
 from src.downloader.fake_ua import random_ua
 
-from src.entities.anime import anime as animClass
+from src.entities.anime import Anime as animClass
 
-API_URL="https://shikimori.me/api/"
+# API_URL="https://shikimori.me/api/"
+API_URL="https://shikimori.one/api/"
 
 
 
 def get_genres():
     user_agent = {'User-Agent': f'{random_ua}'}
     # user_agent = {'User-Agent': f'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'}
-    return [genre["name"] for genre in requests.get("https://shikimori.me/api/genres",headers=user_agent,timeout=5).json() if genre["kind"]=="anime"]
+    # return [genre["name"] for genre in requests.get("https://shikimori.me/api/genres",headers=user_agent,timeout=5).json() if genre["kind"]=="anime"]
+    return [genre["name"] for genre in requests.get("https://shikimori.one/api/genres",headers=user_agent,timeout=5).json() if genre["kind"]=="anime"]
 
 
 def get_user_score(desc):

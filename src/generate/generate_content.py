@@ -19,7 +19,7 @@ package.set("xmlns","http://vladimirkhil.com/ygpackage3.0.xsd")
 info=ET.SubElement(package,"info")
 
 authors=ET.SubElement(info,"authors")
-author=ET.SubElement(authors,"author").text="_"
+author=ET.SubElement(authors,"author").text="bibaiboba"
 comments=ET.SubElement(info,"comments").text="_"
 
 rounds=ET.SubElement(package,"rounds")

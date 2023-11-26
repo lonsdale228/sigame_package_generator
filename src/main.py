@@ -1,7 +1,7 @@
 import asyncio
 import pickle
 import random
-from api_request.getAnimeInfo import getAnimeIds, get_anime_info,remove_duplicates
+from api_request.getAnimeInfo import getAnimeIds, get_anime_info, remove_duplicates
 from create_package.create_package import create_package, clear_trash
 from create_package.transfer_content import transfer_audio
 from downloader.download import download_screenshots, download_videos
@@ -11,6 +11,7 @@ from src.generate import create_dirs
 from entities.generate import Generate
 from src.optimizer.normalize_volume import normalize_audio
 from src.optimizer.sort_anime import sort_by_genres, force_sort_by_genres
+
 
 def resource_path(relative_path):
     import os
@@ -25,17 +26,17 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
-def main(settings:Generate,win):
 
-    AUDIO_DURATION:int = settings.op_duration
-    ANIME_COUNT:int = settings.num_of_total
-    GET_ANIME_MAX:int = settings.num_of_getting
-    DOWNLOAD_SCREENSHOTS:bool =settings.scr_round
-    DOWNLOAD_AUDIO:bool = settings.op_round
-    REMOVE_FRANCHISE_REPEAT:bool = settings.remove_duplicates
-    GPT_ROUND:bool=settings.gpt_round
-    DESC_ROUND:bool=settings.desc_round
-    NICKNAME:str=settings.nickname
+def main(settings: Generate, win):
+    AUDIO_DURATION: int = settings.op_duration
+    ANIME_COUNT: int = settings.num_of_total
+    GET_ANIME_MAX: int = settings.num_of_getting
+    DOWNLOAD_SCREENSHOTS: bool = settings.scr_round
+    DOWNLOAD_AUDIO: bool = settings.op_round
+    REMOVE_FRANCHISE_REPEAT: bool = settings.remove_duplicates
+    GPT_ROUND: bool = settings.gpt_round
+    DESC_ROUND: bool = settings.desc_round
+    NICKNAME: str = settings.nickname
 
     win.set_progress(value=0)
 
@@ -44,16 +45,16 @@ def main(settings:Generate,win):
 
     # file = open('anime_dict10000_v2.txt', 'rb')
     file = open(resource_path('anime_dict10000_v2.txt'), 'rb')
-    anime_dump=pickle.load(file)
+    anime_dump = pickle.load(file)
     file.close()
 
-    anime_list = getAnimeIds(GET_ANIME_MAX,NICKNAME)
+    anime_list = getAnimeIds(GET_ANIME_MAX, NICKNAME)
 
     ids = []
     for anime in anime_list:
         ids.append(anime.id)
 
-    getting_list=[]
+    getting_list = []
 
     for get in getting_list:
         print(get.name)
@@ -61,39 +62,31 @@ def main(settings:Generate,win):
         if anime.id not in anime_dump:
             getting_list.append(anime)
 
-
     get_anime_info(getting_list, REMOVE_FRANCHISE_REPEAT)
-
 
     for i in range(len(anime_list)):
         try:
-            anime_list[i]=anime_dump[anime_list[i].id]
+            anime_list[i] = anime_dump[anime_list[i].id]
             # print("test1: ",anime_list[i].screenshot)
         except Exception as e:
-            print('error: ',e)
+            print('error: ', e)
 
     set_anime_code(anime_list)
 
+    anime_list = anime_list + getting_list
 
-    anime_list=anime_list+getting_list
-
-
-    anime_list=remove_duplicates(anime_list)
+    if REMOVE_FRANCHISE_REPEAT:
+        anime_list = remove_duplicates(anime_list)
 
     random.shuffle(anime_list)
     req_genres = settings.selected_genres
+
     if settings.rb_req_genres:
         anime_list = sort_by_genres(anime_list, req_genres)
     else:
-        anime_list=force_sort_by_genres(anime_list,req_genres)
-
-
+        anime_list = force_sort_by_genres(anime_list, req_genres)
 
     anime_list = anime_list[:ANIME_COUNT]
-
-
-
-
 
     round_list = []
 
@@ -118,10 +111,9 @@ def main(settings:Generate,win):
     transfer_audio()
     create_package()
 
-
-
     clear_trash()
     print("Done!")
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     ...

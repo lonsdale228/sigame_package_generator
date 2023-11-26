@@ -4,13 +4,12 @@ import re
 import time
 import requests
 from fake_useragent import UserAgent
-
+from src.downloader.fake_ua import random_ua
 API_URL="https://shikimori.me/api/"
-ua = UserAgent()
-headers = {'User-Agent': f'{ua.random}'}
 
 
-from src.entities.anime import anime as animClass
+
+from src.entities.anime import Anime as animClass
 
 def get_user_score(desc):
     pattern = re.compile(r'>\s*(\d+)\s*<')
@@ -35,8 +34,15 @@ def getAnimeIds(est_num,shuffle=True):
             "order":"popularity",
             "status":"!anons"
         }
-        history = requests.get(f"{API_URL}animes",params=data,headers=headers).json()
-        print(history)
+        headers = {'User-Agent': f'{random_ua}'}
+        try:
+            history = requests.get(f"{API_URL}animes",params=data,headers=headers).json()
+        except requests.exceptions.JSONDecodeError:
+            print(history)
+        except requests.exceptions.JSONDecodeError:
+            print(history)
+
+        # print(history)
         print(len(history))
         if len(history)==0:
             break
@@ -99,16 +105,16 @@ def remove_duplicates(anime_list:list):
         # if anime.franchise==None:
         #     uniq_anim[f"{anime.name.replace(' ','_').lower()}"] = anime.id
         # else:
-        print(anime.franchise)
+        # print(anime.franchise)
         if anime.franchise!=None:
             uniq_anim[f"{anime.franchise}"] = anime.id
 
     # for anime in anime_list:
     #     if (anime.id in uniq_anim.values()) and (not anime.id in sorted_list):
     #         sorted_list.append(anime)
-    print(uniq_anim)
+    # print(uniq_anim)
     for franchise,anime_id in uniq_anim.items():
-        print(anime_id)
+        # print(anime_id)
         for anime in anime_list:
             if anime_id==anime.id:
                 sorted_list.append(anime)
@@ -140,9 +146,9 @@ def getAnimeInfo(anime_list:list,allow_duplicates:bool):
             anime.kind=animeInfo["kind"]
             anime.franchise=animeInfo["franchise"]
             anime.genres=[genre["name"] for genre in animeInfo["genres"]]
-            print(anime.id,anime.genres)
-            print(anime.franchise)
-            print(anime.screenshot)
+            # print(anime.id,anime.genres)
+            # print(anime.franchise)
+            # print(anime.screenshot)
         except requests.exceptions.HTTPError:
             time.sleep(20)
             print("API Request reached, waiting....")
@@ -160,10 +166,14 @@ def getAnimeInfo(anime_list:list,allow_duplicates:bool):
 
 
 
-anime_list=getAnimeIds(10000,False)
-getAnimeInfo(anime_list,False)
-get_more_screenshots(anime_list)
-print("test: ",anime_list[0].genres)
+anime_list=getAnimeIds(15000,False)
+for i in anime_list:
+    print(f'{i.id},',sep='',end='')
+
+
+# getAnimeInfo(anime_list,False)
+# get_more_screenshots(anime_list)
+# print("test: ",anime_list[0].genres)
 
 
 # anime_list=remove_duplicates(anime_list)
@@ -171,7 +181,7 @@ print("test: ",anime_list[0].genres)
 #     if ("tv" not in anime.kind) or ("movie" not in anime.kind) or ("ona" not in anime.kind):
 #         anime_list.pop(i)
 
-file=open('anime_dump10000.txt','wb')
+file=open('anime_ids_15000.txt','wb')
 pickle.dump(anime_list,file)
 file.close()
 
