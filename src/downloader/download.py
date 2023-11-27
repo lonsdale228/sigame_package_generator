@@ -3,20 +3,16 @@ import os
 import random
 import threading
 import time
-
 import aiofiles as aiofiles
 import aiohttp as aiohttp
-import requests
 from youtubesearchpython import VideosSearch
 from yt_dlp import YoutubeDL
 from src.entities.anime import Anime
-
 from src.downloader.fake_ua import random_ua
 
-NUM_OF_THREADS=12
+NUM_OF_THREADS = os.cpu_count()
+scr_url = "https://shikimori.one/api/animes/%s/screenshots"
 
-
-scr_url="https://shikimori.one/api/animes/%s/screenshots"
 
 # async def get_more_screeshots(anime_list,err_count):
 #     if err_count>5:
@@ -55,7 +51,7 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
-async def scr_download(anime:Anime):
+async def scr_download(anime: Anime):
     try:
         anime_scr = random.choice(anime.screenshots)
         last_dot_index = anime_scr.rfind(".")
@@ -65,7 +61,8 @@ async def scr_download(anime:Anime):
 
         headers = {'User-Agent': f'{random_ua}'}
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"https://shikimori.one/system/screenshots/original/{anime_scr}", headers=headers) as response:
+            async with session.get(f"https://shikimori.one/system/screenshots/original/{anime_scr}",
+                                   headers=headers) as response:
                 if response.status == 200:
                     filename = f"temp\\Images\\{anime.hex_name}{scr_ext}"
                     async with aiofiles.open(filename, 'wb') as f:
@@ -77,6 +74,7 @@ async def scr_download(anime:Anime):
 
     except Exception as e:
         print(f"Error downloading for {anime.name}: {e}")
+
 
 async def download_screenshots(animes):
     total_animes = len(animes)
@@ -105,6 +103,7 @@ def download_videos(anime_list, duration: int):
     for ex in thread_list:
         ex.join()
 
+
 def download_audio(anime, duration):
     name = anime.name
 
@@ -122,7 +121,7 @@ def download_audio(anime, duration):
         'outtmpl': f'downloader/Youtube/{anime.hex_name}.%(ext)s',
         'quiet': True,
         'noprogress': False,
-        'ffmpeg_location':rf"{resource_path('ffmpeg')}"
+        'ffmpeg_location': rf"{resource_path('ffmpeg')}"
 
     }
 
@@ -130,6 +129,7 @@ def download_audio(anime, duration):
         YoutubeDL(ydl_opts).download([url])
     except Exception as e:
         print(f"Error downloading {name}: {e}")
+
 
 def safe_rename(src, dst):
     try:
