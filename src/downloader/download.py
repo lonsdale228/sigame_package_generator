@@ -9,7 +9,7 @@ import aiohttp as aiohttp
 import requests
 from youtubesearchpython import VideosSearch
 from yt_dlp import YoutubeDL
-
+from src.entities.anime import Anime
 
 from src.downloader.fake_ua import random_ua
 
@@ -55,24 +55,25 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
-async def scr_download(anime, ext=".jpg",err=False):
+async def scr_download(anime:Anime):
     try:
-        anime_scr = random.choice(anime.screenshot)
+        anime_scr = random.choice(anime.screenshots)
+        last_dot_index = anime_scr.rfind(".")
+        scr_ext = anime_scr[last_dot_index:]
+
+        anime.scr_ext = scr_ext
+
         headers = {'User-Agent': f'{random_ua}'}
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"https://shikimori.one/system/screenshots/original/{anime_scr}" + ext, headers=headers) as response:
-            # async with session.get(f"https://shikimori.me/system/screenshots/original/{anime_scr}" + ext, headers=headers) as response:
+            async with session.get(f"https://shikimori.one/system/screenshots/original/{anime_scr}", headers=headers) as response:
                 if response.status == 200:
-                    filename = f"temp\\Images\\{anime.hex_name}.jpg"
+                    filename = f"temp\\Images\\{anime.hex_name}{scr_ext}"
                     async with aiofiles.open(filename, 'wb') as f:
                         while True:
                             chunk = await response.content.read(8192)
                             if not chunk:
                                 break
                             await f.write(chunk)
-                elif ext == ".jpg" and not err:
-                    print("error on " + anime.name, f"https://shikimori.one/system/screenshots/original/{anime_scr}" + ext)
-                    await scr_download(anime, ext=".png",err=True)
 
     except Exception as e:
         print(f"Error downloading for {anime.name}: {e}")
@@ -129,14 +130,13 @@ def download_audio(anime, duration):
         YoutubeDL(ydl_opts).download([url])
     except Exception as e:
         print(f"Error downloading {name}: {e}")
-        # Optional: Implement a retry mechanism here
 
 def safe_rename(src, dst):
     try:
         os.rename(src, dst)
     except OSError as e:
         print(f"Error renaming file: {e}")
-        time.sleep(1)  # Wait for a second and try again
+        time.sleep(1)
         try:
             os.rename(src, dst)
         except OSError as e:

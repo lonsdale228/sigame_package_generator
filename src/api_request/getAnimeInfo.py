@@ -6,7 +6,7 @@ import requests
 
 from src.downloader.fake_ua import random_ua
 
-from src.entities.anime import Anime as animClass
+from src.entities.anime import Anime
 
 # API_URL="https://shikimori.me/api/"
 API_URL="https://shikimori.one/api/"
@@ -53,14 +53,18 @@ def getAnimeIds(est_num,username,shuffle=True):
             break
         for i in history:
             if "Просмотрено" in i['description']:
-                anime_list.append(animClass(
-                    id=i['target']['id'],
-                    name=i['target']['name'],
-                    name_rus=i['target']['russian'],
-                    anime_score=i['target']['score'],
-                    poster=i['target']['image']['original'],
-                    user_score=get_user_score(i['description'])
-                ))
+
+                anime=Anime()
+                anime.id = i['target']['id']
+                anime.name = i['target']['name']
+                anime.name_rus = i['target']['russian']
+                anime.anime_score = i['target']['score']
+                anime.poster = i['target']['image']['original']
+                anime.user_score = get_user_score(i['description'])
+
+                # print(i['target'])
+                anime_list.append(anime)
+
                 anime_num += 1
         page+=1
 
@@ -69,19 +73,31 @@ def getAnimeIds(est_num,username,shuffle=True):
     return anime_list
 
 
-def remove_duplicates(anime_list:list):
-    uniq_anim = {}
-    sorted_list=[]
-    for anime in anime_list:
-        if anime.franchise==None:
-            uniq_anim[f"{anime.name.replace(' ','_').lower()}"] = anime.id
-        else:
-            uniq_anim[f"{anime.franchise}"] = anime.id
+# def remove_duplicates(anime_list:list):
+#     uniq_anim = {}
+#     sorted_list=[]
+#     for anime in anime_list:
+#         if anime.franchise==None:
+#             uniq_anim[f"{anime.name.replace(' ','_').lower()}"] = anime.id
+#         else:
+#             uniq_anim[f"{anime.franchise}"] = anime.id
+#
+#     for anime in anime_list:
+#         if (anime.id in uniq_anim.values()) and (not anime.id in sorted_list):
+#             sorted_list.append(anime)
+#     return sorted_list
+
+def remove_duplicates(anime_list: list[Anime]):
+    unique_franchises = set()
+
+    removed_duplicates = []
 
     for anime in anime_list:
-        if (anime.id in uniq_anim.values()) and (not anime.id in sorted_list):
-            sorted_list.append(anime)
-    return sorted_list
+        if anime.franchise not in unique_franchises:
+            unique_franchises.add(anime.franchise)
+            removed_duplicates.append(anime)
+
+    return removed_duplicates
 
 def get_anime_info(anime_list:list,allow_duplicates:bool):
     end=len(anime_list)
@@ -92,7 +108,7 @@ def get_anime_info(anime_list:list,allow_duplicates:bool):
             #anime.screenshot = random.choice(requests.get(f"{API_URL}animes/{anime.id}/screenshots",headers=headers).json())['original']
             scr_url=random.choice(animeInfo["screenshots"])['original']
             result = re.search(r'[^/]+(?=\.)', scr_url)
-            anime.screenshot = [result.group()]
+            anime.screenshots = [result.group()]
             # print("result group:", anime.screenshot)
             anime.kind=animeInfo["kind"]
             anime.franchise=animeInfo["franchise"]
@@ -106,7 +122,7 @@ def get_anime_info(anime_list:list,allow_duplicates:bool):
             animeInfo = requests.get(f"{API_URL}animes/{anime.id}", headers=headers).json()
             scr_url = random.choice(animeInfo["screenshots"])['original']
             result = re.search(r'[^/]+(?=\.)', scr_url)
-            anime.screenshot = [result.group()]
+            anime.screenshots = [result.group()]
             # print("result group:", anime.screenshot)
 
             anime.kind = animeInfo["kind"]

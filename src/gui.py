@@ -8,10 +8,9 @@ from PyQt6.uic import loadUi
 
 from MainWindow import Ui_MainWindow
 from entities.generate import Generate
-
+from entities.anime import Anime
 from main import main
 
-from entities.anime import anime as animClass
 genres=sorted(['Drama', 'Game', 'Psychological', 'Adventure', 'Music', 'Gourmet', 'Action', 'Comedy', 'Demons', 'Police', 'Space', 'Ecchi', 'Fantasy', 'Hentai', 'Historical', 'Horror', 'Magic', 'Mecha', 'Parody', 'Samurai', 'Romance', 'School', 'Erotica', 'Shounen', 'Vampire', 'Yaoi', 'Yuri', 'Harem', 'Slice of Life', 'Shoujo Ai', 'Josei', 'Supernatural', 'Thriller', 'Sci-Fi', 'Shoujo', 'Super Power', 'Military', 'Mystery', 'Kids', 'Cars', 'Martial Arts', 'Dementia', 'Sports', 'Work Life', 'Seinen', 'Shounen Ai'])
 
 class Window(QMainWindow, Ui_MainWindow):
