@@ -89,22 +89,27 @@ async def download_screenshots(animes):
 
     await asyncio.gather(*(download_and_track_progress(anime) for anime in animes))
 
+completed_downloads = 0
+lock = threading.Lock()
 
 def download_videos(anime_list, duration: int):
+    print(f"Downloading {len(anime_list)} videos...")
     thread_list = []
     for anime in anime_list:
-        t = threading.Thread(target=download_audio, args=(anime, duration))
+        t = threading.Thread(target=download_audio, args=(anime, duration, len(anime_list)))
         thread_list.append(t)
         t.start()
 
-        while threading.active_count() > NUM_OF_THREADS:
-            time.sleep(1)
+        # while threading.active_count() > NUM_OF_THREADS:
+        #     time.sleep(1)
 
     for ex in thread_list:
         ex.join()
+    print("Downloaded!")
 
+def download_audio(anime, duration,list_len):
+    global completed_downloads
 
-def download_audio(anime, duration):
     name = anime.name
 
     videosSearch = VideosSearch(name + " anime opening", limit=1)
@@ -120,13 +125,16 @@ def download_audio(anime, duration):
         'postprocessor_args': ['-ss', '00:00:00', '-t', f'{duration}', '-c:a', 'aac', '-b:a', '96k'],
         'outtmpl': f'downloader/Youtube/{anime.hex_name}.%(ext)s',
         'quiet': True,
-        'noprogress': False,
+        'noprogress': True,
         'ffmpeg_location': rf"{resource_path('ffmpeg')}"
 
     }
 
     try:
         YoutubeDL(ydl_opts).download([url])
+        with lock:
+            completed_downloads+=1
+            print(f"Downloaded {completed_downloads}/{list_len} videos")
     except Exception as e:
         print(f"Error downloading {name}: {e}")
 
