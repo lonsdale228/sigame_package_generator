@@ -72,7 +72,7 @@ def create_lines(animes: list[Anime], questions_per_line=15, round_type=''):
     return line_list
 
 
-def create_round(animes, line_limit, round_type):
+def create_rounds(animes, line_limit, round_type):
     line_name = "Default"
     round_name = "Default round"
     match round_type:

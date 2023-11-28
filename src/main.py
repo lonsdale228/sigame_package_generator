@@ -5,7 +5,7 @@ from api_request.getAnimeInfo import getAnimeIds, get_anime_info, remove_duplica
 from create_package.create_package import create_package, clear_trash
 from create_package.transfer_content import transfer_audio
 from downloader.download import download_screenshots, download_videos
-from generate.generate_content import create_round, create_xml ,create_xml_rounds
+from generate.generate_content import create_rounds, create_xml, create_xml_rounds
 from src.api_request.setAnimeCode import set_anime_code
 from src.entities.rounds import Round
 from src.generate import create_dirs
@@ -43,7 +43,6 @@ def main(settings: Generate, win):
     GPT_ROUND: bool = settings.gpt_round
     DESC_ROUND: bool = settings.desc_round
     NICKNAME: str = settings.nickname
-
     ONA_RB: bool = settings.ona
     OVA_RB: bool = settings.ova
     MOVIE_RB: bool = settings.movie
@@ -103,20 +102,20 @@ def main(settings: Generate, win):
         anime_list = force_sort_by_genres(anime_list, req_genres)
 
     # limit total anime count
-    # anime_list: list[Anime] = anime_list[:ANIME_COUNT]
+    anime_list: list[Anime] = anime_list[:ANIME_COUNT]
 
-    round_list:list[Round] = []
+    round_list: list[Round] = []
 
     if DOWNLOAD_AUDIO:
         download_videos(anime_list, AUDIO_DURATION)
         # normalize_audio()
-        rounds_audio = create_round(anime_list[:], 10, round_type='voice')
+        rounds_audio = create_rounds(anime_list[:], 10, round_type='voice')
         round_list = round_list + rounds_audio
 
     if DOWNLOAD_SCREENSHOTS:
         asyncio.run(download_screenshots(anime_list))
         compress_images()
-        rounds_scr = create_round(anime_list[:], 10, round_type='image')
+        rounds_scr = create_rounds(anime_list[:], 10, round_type='image')
         round_list = round_list + rounds_scr
 
     if DESC_ROUND:
