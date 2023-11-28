@@ -79,7 +79,6 @@ def main(settings: Generate, win):
     for i in range(len(anime_list)):
         try:
             anime_list[i] = anime_dump[anime_list[i].id]
-            # print("test1: ",anime_list[i].screenshot)
         except Exception as e:
             print('error: ', e)
 
@@ -95,11 +94,12 @@ def main(settings: Generate, win):
     sort_by_kind(anime_list, ONA_RB, OVA_RB, SPECIAL_RB, MOVIE_RB)
 
     # genre sort
-    req_genres = settings.selected_genres
-    if settings.rb_req_genres:
-        anime_list = sort_by_genres(anime_list, req_genres)
-    else:
-        anime_list = force_sort_by_genres(anime_list, req_genres)
+    if settings.selected_genres:
+        req_genres = settings.selected_genres
+        if settings.rb_req_genres:
+            anime_list = sort_by_genres(anime_list, req_genres)
+        else:
+            anime_list = force_sort_by_genres(anime_list, req_genres)
 
     # limit total anime count
     anime_list: list[Anime] = anime_list[:ANIME_COUNT]
@@ -109,13 +109,13 @@ def main(settings: Generate, win):
     if DOWNLOAD_AUDIO:
         download_videos(anime_list, AUDIO_DURATION)
         # normalize_audio()
-        rounds_audio = create_rounds(anime_list[:], 10, round_type='voice')
+        rounds_audio = create_rounds(anime_list[:], line_limit=10, per_line_limit=15, round_type='voice')
         round_list = round_list + rounds_audio
 
     if DOWNLOAD_SCREENSHOTS:
         asyncio.run(download_screenshots(anime_list))
         compress_images()
-        rounds_scr = create_rounds(anime_list[:], 10, round_type='image')
+        rounds_scr = create_rounds(anime_list[:], line_limit=10, per_line_limit=15, round_type='image')
         round_list = round_list + rounds_scr
 
     if DESC_ROUND:
@@ -134,8 +134,6 @@ def main(settings: Generate, win):
         repeat_test.append(a.franchise)
 
     print("Anime repeates: ", len(repeated))
-
-    print(round_list)
 
     create_xml(round_list, NICKNAME)
 
