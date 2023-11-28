@@ -5,15 +5,16 @@ from api_request.getAnimeInfo import getAnimeIds, get_anime_info, remove_duplica
 from create_package.create_package import create_package, clear_trash
 from create_package.transfer_content import transfer_audio
 from downloader.download import download_screenshots, download_videos
-from generate.generate_content import create_round, create_xml_round, create_xml, create_scr_round
+from generate.generate_content import create_round, create_xml_round, create_xml, create_scr_rounds
 from src.api_request.setAnimeCode import set_anime_code
 from src.generate import create_dirs
 from entities.generate import Generate
 from src.optimizer.compress_images import compress_images
 from src.optimizer.normalize_volume import normalize_audio
-from src.optimizer.sort_anime import sort_by_genres, force_sort_by_genres
+from src.optimizer.sort_anime import sort_by_genres, force_sort_by_genres, sort_by_kind
 
 from entities.anime import Anime
+
 
 def resource_path(relative_path):
     import os
@@ -70,7 +71,7 @@ def main(settings: Generate, win):
         if anime.id not in anime_dump:
             getting_list.append(anime)
 
-    print(*[i.name for i in getting_list],sep='***')
+    print(*[i.name for i in getting_list], sep='***')
     get_anime_info(getting_list)
 
     for i in range(len(anime_list)):
@@ -88,40 +89,19 @@ def main(settings: Generate, win):
         anime_list: list[Anime] = remove_duplicates(anime_list)
     random.shuffle(anime_list)
 
-    #kind sort
-    for_remove=[]
-    if not ONA_RB:
-        for i in range(len(anime_list)):
-            if anime_list[i].kind in ['ona','tv','tv_13','tv_24','tv_48']:
-                for_remove.append(anime_list[i])
-    if not OVA_RB:
-        for i in range(len(anime_list)):
-            if anime_list[i].kind in ['ova']:
-                for_remove.append(anime_list[i])
-    if not SPECIAL_RB:
-        for i in range(len(anime_list)):
-            if anime_list[i].kind in ['special']:
-                for_remove.append(anime_list[i])
-    if not MOVIE_RB:
-        for i in range(len(anime_list)):
-            if anime_list[i].kind in ['movie']:
-                for_remove.append(anime_list[i])
-
-    for i in for_remove:
-        anime_list.remove(i)
-
+    # kind sort
+    sort_by_kind(anime_list, ONA_RB, OVA_RB, SPECIAL_RB, MOVIE_RB)
 
     # genre sort
-    for i in anime_list:
-        print(i.genres, i.name)
-
     req_genres = settings.selected_genres
     if settings.rb_req_genres:
         anime_list = sort_by_genres(anime_list, req_genres)
     else:
         anime_list = force_sort_by_genres(anime_list, req_genres)
 
-    anime_list:list[Anime] = anime_list[:ANIME_COUNT]
+
+    # limit total anime count
+    # anime_list: list[Anime] = anime_list[:ANIME_COUNT]
 
     round_list = []
 
@@ -134,23 +114,23 @@ def main(settings: Generate, win):
     if DOWNLOAD_SCREENSHOTS:
         asyncio.run(download_screenshots(anime_list))
         compress_images()
-        round_scr = create_scr_round(anime_list[:])
-        round_list.append(create_xml_round(round_scr, "image"))
+        scr_rounds = create_xml_round(create_scr_rounds(anime_list[:]),'image')
+        round_list = round_list + scr_rounds
     if DESC_ROUND:
         ...
 
     if GPT_ROUND:
         ...
 
-    repeat_test=[]
-    repeated=[]
+    repeat_test = []
+    repeated = []
     for a in anime_list:
         if a.franchise in repeat_test:
             repeated.append(a)
         repeat_test.append(a.franchise)
 
     print("Anime repeates: ", len(repeated))
-    create_xml(round_list)
+    create_xml(round_list, NICKNAME)
 
     transfer_audio()
     create_package()

@@ -1,14 +1,14 @@
-class round:
+class Round:
     def __init__(self):
         self.name="None"
         self.lines="None"
 
-class line:
+class Line:
     def __init__(self):
         self.name="None"
         self.questions="None"
 
-class question:
+class Question:
     def __init__(self):
         self.price="None"
         self.say="None"
