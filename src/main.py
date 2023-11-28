@@ -5,8 +5,9 @@ from api_request.getAnimeInfo import getAnimeIds, get_anime_info, remove_duplica
 from create_package.create_package import create_package, clear_trash
 from create_package.transfer_content import transfer_audio
 from downloader.download import download_screenshots, download_videos
-from generate.generate_content import create_round, create_xml_round, create_xml
+from generate.generate_content import create_round, create_xml ,create_xml_rounds
 from src.api_request.setAnimeCode import set_anime_code
+from src.entities.rounds import Round
 from src.generate import create_dirs
 from entities.generate import Generate
 from src.optimizer.compress_images import compress_images
@@ -37,6 +38,8 @@ def main(settings: Generate, win):
     DOWNLOAD_SCREENSHOTS: bool = settings.scr_round
     DOWNLOAD_AUDIO: bool = settings.op_round
     REMOVE_FRANCHISE_REPEAT: bool = settings.remove_duplicates
+    SHUFFLE_LINES: bool = settings.shuffle_lines
+    SHUFFLE_QUESTIONS: bool = settings.shuffle_questions
     GPT_ROUND: bool = settings.gpt_round
     DESC_ROUND: bool = settings.desc_round
     NICKNAME: str = settings.nickname
@@ -102,26 +105,27 @@ def main(settings: Generate, win):
     # limit total anime count
     # anime_list: list[Anime] = anime_list[:ANIME_COUNT]
 
-    round_list = []
+    round_list:list[Round] = []
 
     if DOWNLOAD_AUDIO:
         download_videos(anime_list, AUDIO_DURATION)
         # normalize_audio()
         rounds_audio = create_round(anime_list[:], 10, round_type='voice')
-        audio_rounds = create_xml_round(rounds_audio, 'voice')
-        round_list = round_list + audio_rounds
+        round_list = round_list + rounds_audio
 
     if DOWNLOAD_SCREENSHOTS:
         asyncio.run(download_screenshots(anime_list))
         compress_images()
         rounds_scr = create_round(anime_list[:], 10, round_type='image')
-        scr_rounds = create_xml_round(rounds_scr, 'image')
-        round_list = round_list + scr_rounds
+        round_list = round_list + rounds_scr
+
     if DESC_ROUND:
         ...
 
     if GPT_ROUND:
         ...
+
+    round_list = create_xml_rounds(round_list, shuffle_lines=SHUFFLE_LINES, shuffle_questions=SHUFFLE_QUESTIONS)
 
     repeat_test = []
     repeated = []

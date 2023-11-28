@@ -56,7 +56,6 @@ def create_lines(animes: list[Anime], questions_per_line=15, round_type=''):
 
                 line_list.append(temp_line)
 
-
             case 'voice':
                 for i in range(questions_per_line + 1):
                     if len(animes) == 0:
@@ -106,8 +105,74 @@ def create_round(animes, line_limit, round_type):
     return round_list
 
 
-def create_xml_round(round_list: list, round_type: str) -> list:
+# def create_xml_round(round_list: list) -> list:
+#
+#     xml_rounds_list = []
+#     for i, round in enumerate(round_list):
+#         xml_round = ET.Element("round", name=f'{round.name} {i}')
+#         xml_themes = ET.SubElement(xml_round, "themes")
+#         for line in round.lines:
+#             if line.questions:
+#                 xml_line = ET.SubElement(xml_themes, "theme", name=line.name)
+#                 xml_questions = ET.SubElement(xml_line, "questions")
+#                 for question in line.questions:
+#                     xml_que = ET.SubElement(xml_questions, "question", price=f"{question.price}")
+#                     xml_scenario = ET.SubElement(xml_que, "scenario")
+#                     xml_atom_type = ET.SubElement(xml_scenario, "atom", type=f"{question.type}")
+#                     match question.type:
+#                         case "voice":
+#                             xml_atom_type.text = "@" + question.hex + ".m4a"
+#                         case "image":
+#                             xml_atom_type.text = "@" + question.hex + question.ext
+#                         case "video":
+#                             xml_atom_type.text = "@" + question.hex + ".mp4"
+#                     xml_right = ET.SubElement(xml_que, "right")
+#                     xml_answer = ET.SubElement(xml_right, "answer")
+#
+#                     xml_answer.text = question.answer
+#         xml_rounds_list.append(xml_round)
+#     return xml_rounds_list
+
+
+def create_xml_rounds(round_list: list, shuffle_lines: bool = True, shuffle_questions: bool = True) -> list:
     xml_rounds_list = []
+
+    import random
+    if shuffle_lines:
+        all_lines = []
+        for anime_round in round_list:
+            all_lines = all_lines + anime_round.lines
+        max_num = max(len(i.lines) for i in round_list)
+
+        random.shuffle(all_lines)
+
+        start_index = 0
+        for anime_round in round_list:
+            anime_round.lines = all_lines[start_index:start_index + max_num]
+            start_index += max_num
+
+        for anime_round in round_list:
+            anime_round.name = "Shuffled lines"
+
+    if shuffle_questions:
+        all_questions = []
+        for anime_round in round_list:
+            for line in anime_round.lines:
+                all_questions = all_questions + line.questions
+        random.shuffle(all_questions)
+
+        question_index = 0
+
+        for anime_round in round_list:
+            for line in anime_round.lines:
+                question_count = len(line.questions)
+                line.questions = all_questions[question_index:question_index + question_count]
+                question_index += question_count
+
+        for anime_round in round_list:
+            for line in anime_round.lines:
+                line.name = "Shuffled questions"
+
     for i, round in enumerate(round_list):
         xml_round = ET.Element("round", name=f'{round.name} {i}')
         xml_themes = ET.SubElement(xml_round, "themes")
@@ -119,17 +184,16 @@ def create_xml_round(round_list: list, round_type: str) -> list:
                     xml_que = ET.SubElement(xml_questions, "question", price=f"{question.price}")
                     xml_scenario = ET.SubElement(xml_que, "scenario")
                     xml_atom_type = ET.SubElement(xml_scenario, "atom", type=f"{question.type}")
-                    match round_type:
-
+                    match question.type:
                         case "voice":
                             xml_atom_type.text = "@" + question.hex + ".m4a"
                         case "image":
                             xml_atom_type.text = "@" + question.hex + question.ext
                         case "video":
                             xml_atom_type.text = "@" + question.hex + ".mp4"
-
                     xml_right = ET.SubElement(xml_que, "right")
                     xml_answer = ET.SubElement(xml_right, "answer")
+
                     xml_answer.text = question.answer
         xml_rounds_list.append(xml_round)
     return xml_rounds_list
