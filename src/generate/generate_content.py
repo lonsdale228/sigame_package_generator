@@ -53,7 +53,7 @@ def create_screenshot_line(animes: list[Anime], limit=15):
     return temp_line
 
 
-def create_audio_line(animes, limit=15, start=1):
+def create_audio_line(animes, limit=15):
     temp_line = line()
     temp_line.questions = []
 
@@ -74,16 +74,17 @@ def create_audio_line(animes, limit=15, start=1):
     return temp_line
 
 
-def create_scr_round(animes, limit=10):
+def create_scr_round(animes, line_limit=10):
     from src.entities.rounds import round
     temp_round = round()
     temp_round.lines = []
     temp_round.name = "Screenshots"
-    for i in range(limit):
+    for i in range(line_limit):
         temp_round.lines.append(create_screenshot_line(animes))
         temp_round.lines[i].name = f"Screenshot {i + 1}"
     return temp_round
 
+#hello
 
 def create_round(animes, limit=10):
     from src.entities.rounds import round
