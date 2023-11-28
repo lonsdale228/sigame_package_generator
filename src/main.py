@@ -40,6 +40,11 @@ def main(settings: Generate, win):
     DESC_ROUND: bool = settings.desc_round
     NICKNAME: str = settings.nickname
 
+    ONA_RB: bool = settings.ona
+    OVA_RB: bool = settings.ova
+    MOVIE_RB: bool = settings.movie
+    SPECIAL_RB: bool = settings.specials
+
     win.set_progress(value=0)
 
     clear_trash()
@@ -66,7 +71,7 @@ def main(settings: Generate, win):
             getting_list.append(anime)
 
     print(*[i.name for i in getting_list],sep='***')
-    get_anime_info(getting_list, REMOVE_FRANCHISE_REPEAT)
+    get_anime_info(getting_list)
 
     for i in range(len(anime_list)):
         try:
@@ -80,9 +85,31 @@ def main(settings: Generate, win):
     anime_list = anime_list + getting_list
 
     if REMOVE_FRANCHISE_REPEAT:
-        anime_list = remove_duplicates(anime_list)
-
+        anime_list: list[Anime] = remove_duplicates(anime_list)
     random.shuffle(anime_list)
+
+    #kind sort
+    for_remove=[]
+    if not ONA_RB:
+        for i in range(len(anime_list)):
+            if anime_list[i].kind in ['ona','tv','tv_13','tv_24','tv_48']:
+                for_remove.append(anime_list[i])
+    if not OVA_RB:
+        for i in range(len(anime_list)):
+            if anime_list[i].kind in ['ova']:
+                for_remove.append(anime_list[i])
+    if not SPECIAL_RB:
+        for i in range(len(anime_list)):
+            if anime_list[i].kind in ['special']:
+                for_remove.append(anime_list[i])
+    if not MOVIE_RB:
+        for i in range(len(anime_list)):
+            if anime_list[i].kind in ['movie']:
+                for_remove.append(anime_list[i])
+
+    for i in for_remove:
+        anime_list.remove(i)
+
 
     # genre sort
     for i in anime_list:
