@@ -5,7 +5,7 @@ from api_request.getAnimeInfo import getAnimeIds, get_anime_info, remove_duplica
 from create_package.create_package import create_package, clear_trash
 from create_package.transfer_content import transfer_audio
 from downloader.download import download_screenshots, download_videos
-from generate.generate_content import create_round, create_xml_round, create_xml, create_scr_rounds
+from generate.generate_content import create_round, create_xml_round, create_xml
 from src.api_request.setAnimeCode import set_anime_code
 from src.generate import create_dirs
 from entities.generate import Generate
@@ -99,7 +99,6 @@ def main(settings: Generate, win):
     else:
         anime_list = force_sort_by_genres(anime_list, req_genres)
 
-
     # limit total anime count
     # anime_list: list[Anime] = anime_list[:ANIME_COUNT]
 
@@ -108,13 +107,15 @@ def main(settings: Generate, win):
     if DOWNLOAD_AUDIO:
         download_videos(anime_list, AUDIO_DURATION)
         # normalize_audio()
-        round_audio = create_round(anime_list[:])
-        round_list.append(create_xml_round(round_audio, "audio"))
+        rounds_audio = create_round(anime_list[:], 10, round_type='voice')
+        audio_rounds = create_xml_round(rounds_audio, 'voice')
+        round_list = round_list + audio_rounds
 
     if DOWNLOAD_SCREENSHOTS:
         asyncio.run(download_screenshots(anime_list))
         compress_images()
-        scr_rounds = create_xml_round(create_scr_rounds(anime_list[:]),'image')
+        rounds_scr = create_round(anime_list[:], 10, round_type='image')
+        scr_rounds = create_xml_round(rounds_scr, 'image')
         round_list = round_list + scr_rounds
     if DESC_ROUND:
         ...
@@ -130,6 +131,9 @@ def main(settings: Generate, win):
         repeat_test.append(a.franchise)
 
     print("Anime repeates: ", len(repeated))
+
+    print(round_list)
+
     create_xml(round_list, NICKNAME)
 
     transfer_audio()
