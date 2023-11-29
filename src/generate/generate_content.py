@@ -186,7 +186,7 @@ def create_xml_rounds(round_list: list, shuffle_lines: bool = True, shuffle_ques
                     xml_atom_type = ET.SubElement(xml_scenario, "atom", type=f"{question.type}")
                     match question.type:
                         case "voice":
-                            xml_atom_type.text = "@" + question.hex + ".m4a"
+                            xml_atom_type.text = "@" + question.hex + ".mp3"
                         case "image":
                             xml_atom_type.text = "@" + question.hex + question.ext
                         case "video":

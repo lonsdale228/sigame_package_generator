@@ -119,10 +119,10 @@ def download_audio(anime, duration,list_len, quality):
         'format': 'm4a/bestaudio/best',
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'm4a',
+            'preferredcodec': 'mp3',
             'preferredquality': f'{quality}'
         }],
-        'postprocessor_args': ['-ss', '00:00:00', '-t', f'{duration}', '-c:a', 'aac', '-b:a', f'{quality}k'],
+        'postprocessor_args': ['-ss', '00:00:00', '-t', f'{duration}', '-c:a', 'libmp3lame', '-b:a', f'{quality}k'],
         'outtmpl': f'downloader/Youtube/{anime.hex_name}.%(ext)s',
         'quiet': True,
         'noprogress': True,
