@@ -53,9 +53,7 @@ def main(settings: Generate, win):
     clear_trash()
     create_dirs()
 
-    # file = open('anime_dict10000_v2.txt', 'rb')
     file = open(resource_path('15000_animes.txt'), 'rb')
-    # file = open(resource_path('anime_dict10000_v2.txt'), 'rb')
     anime_dump = pickle.load(file)
     file.close()
 
@@ -107,7 +105,7 @@ def main(settings: Generate, win):
     round_list: list[Round] = []
 
     if DOWNLOAD_AUDIO:
-        download_videos(anime_list, AUDIO_DURATION)
+        download_videos(anime_list, AUDIO_DURATION, quality=96)
         # normalize_audio()
         rounds_audio = create_rounds(anime_list[:], line_limit=10, per_line_limit=15, round_type='voice')
         round_list = round_list + rounds_audio

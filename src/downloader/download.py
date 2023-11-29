@@ -92,11 +92,11 @@ async def download_screenshots(animes):
 completed_downloads = 0
 lock = threading.Lock()
 
-def download_videos(anime_list, duration: int):
+def download_videos(anime_list, duration: int, quality):
     print(f"Downloading {len(anime_list)} videos...")
     thread_list = []
     for anime in anime_list:
-        t = threading.Thread(target=download_audio, args=(anime, duration, len(anime_list)))
+        t = threading.Thread(target=download_audio, args=(anime, duration, len(anime_list), quality))
         thread_list.append(t)
         t.start()
 
@@ -107,7 +107,7 @@ def download_videos(anime_list, duration: int):
         ex.join()
     print("Downloaded!")
 
-def download_audio(anime, duration,list_len):
+def download_audio(anime, duration,list_len, quality):
     global completed_downloads
 
     name = anime.name
@@ -120,14 +120,13 @@ def download_audio(anime, duration,list_len):
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'm4a',
-            'preferredquality': '96'
+            'preferredquality': f'{quality}'
         }],
-        'postprocessor_args': ['-ss', '00:00:00', '-t', f'{duration}', '-c:a', 'aac', '-b:a', '96k'],
+        'postprocessor_args': ['-ss', '00:00:00', '-t', f'{duration}', '-c:a', 'aac', '-b:a', f'{quality}k'],
         'outtmpl': f'downloader/Youtube/{anime.hex_name}.%(ext)s',
         'quiet': True,
         'noprogress': True,
         'ffmpeg_location': rf"{resource_path('ffmpeg')}"
-
     }
 
     try:
