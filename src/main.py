@@ -62,6 +62,8 @@ def main(settings: Generate, win):
 
     DONT_USE_GENRES: bool = settings.dont_use_genres
 
+    THREAD_NUM = settings.downloading_thread
+
     win.set_progress(value=0)
 
     clear_trash()
@@ -119,7 +121,7 @@ def main(settings: Generate, win):
     round_list: list[Round] = []
 
     if DOWNLOAD_AUDIO:
-        download_videos(anime_list, AUDIO_DURATION, quality=AUDIO_QUALITY)
+        download_videos(anime_list, AUDIO_DURATION, THREAD_NUM ,quality=AUDIO_QUALITY)
         # normalize_audio()
         rounds_audio = create_rounds(anime_list[:], line_limit=10, per_line_limit=15, round_type='voice')
         round_list = round_list + rounds_audio

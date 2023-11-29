@@ -10,7 +10,6 @@ from yt_dlp import YoutubeDL
 from src.entities.anime import Anime
 from src.downloader.fake_ua import random_ua
 
-NUM_OF_THREADS = os.cpu_count()
 scr_url = "https://shikimori.one/api/animes/%s/screenshots"
 
 
@@ -92,7 +91,7 @@ async def download_screenshots(animes):
 completed_downloads = 0
 lock = threading.Lock()
 
-def download_videos(anime_list, duration: int, quality):
+def download_videos(anime_list, duration: int, thead_num: int = os.cpu_count() ,quality = 60):
     print(f"Downloading {len(anime_list)} videos...")
     thread_list = []
     for anime in anime_list:
@@ -100,8 +99,8 @@ def download_videos(anime_list, duration: int, quality):
         thread_list.append(t)
         t.start()
 
-        # while threading.active_count() > NUM_OF_THREADS:
-        #     time.sleep(1)
+        while threading.active_count() > thead_num:
+            time.sleep(1)
 
     for ex in thread_list:
         ex.join()
