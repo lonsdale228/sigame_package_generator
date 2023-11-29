@@ -29,6 +29,12 @@ class Generate():
     rb_req_genres:bool=None
     rb_included_genres:bool=None
 
+    def __init__(self):
+        self.dont_use_genres = None
+        self.compress_after = None
+        self.audio_compress_bitrate = None
+        self.image_compress_percent = None
+
     def __enter__(self):
         return self
 

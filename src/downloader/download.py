@@ -112,8 +112,8 @@ def download_audio(anime, duration,list_len, quality):
 
     name = anime.name
 
-    videosSearch = VideosSearch(name + " anime opening", limit=1)
-    url = videosSearch.result()["result"][-1]['link']
+    videos_search = VideosSearch(name + " anime opening", limit=1)
+    url = videos_search.result()["result"][-1]['link']
 
     ydl_opts = {
         'format': 'm4a/bestaudio/best',
@@ -123,6 +123,7 @@ def download_audio(anime, duration,list_len, quality):
             'preferredquality': f'{quality}'
         }],
         'postprocessor_args': ['-ss', '00:00:00', '-t', f'{duration}', '-c:a', 'libmp3lame', '-b:a', f'{quality}k'],
+        # 'postprocessor_args': ['-ss', '00:00:00', '-t', f'{duration}', '-c:a', 'libmp3lame', '-q:a', f'4'],
         'outtmpl': f'downloader/Youtube/{anime.hex_name}.%(ext)s',
         'quiet': True,
         'noprogress': True,

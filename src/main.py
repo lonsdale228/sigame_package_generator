@@ -35,18 +35,32 @@ def main(settings: Generate, win):
     AUDIO_DURATION: int = settings.op_duration
     ANIME_COUNT: int = settings.num_of_total
     GET_ANIME_MAX: int = settings.num_of_getting
+
+    # rounds
     DOWNLOAD_SCREENSHOTS: bool = settings.scr_round
     DOWNLOAD_AUDIO: bool = settings.op_round
+    DESC_ROUND: bool = settings.desc_round
+    GPT_ROUND: bool = settings.gpt_round
+
+    # creation modifier
     REMOVE_FRANCHISE_REPEAT: bool = settings.remove_duplicates
     SHUFFLE_LINES: bool = settings.shuffle_lines
     SHUFFLE_QUESTIONS: bool = settings.shuffle_questions
-    GPT_ROUND: bool = settings.gpt_round
-    DESC_ROUND: bool = settings.desc_round
+
+
     NICKNAME: str = settings.nickname
+
+    # kind sort
     ONA_RB: bool = settings.ona
     OVA_RB: bool = settings.ova
     MOVIE_RB: bool = settings.movie
     SPECIAL_RB: bool = settings.specials
+
+    IMAGE_QUALITY: int = settings.image_compress_percent
+    AUDIO_QUALITY: int = settings.audio_compress_bitrate
+    COMPRESS_AFTER: int = settings.compress_after
+
+    DONT_USE_GENRES: bool = settings.dont_use_genres
 
     win.set_progress(value=0)
 
@@ -92,7 +106,7 @@ def main(settings: Generate, win):
     sort_by_kind(anime_list, ONA_RB, OVA_RB, SPECIAL_RB, MOVIE_RB)
 
     # genre sort
-    if settings.selected_genres:
+    if not DONT_USE_GENRES:
         req_genres = settings.selected_genres
         if settings.rb_req_genres:
             anime_list = sort_by_genres(anime_list, req_genres)
@@ -105,14 +119,15 @@ def main(settings: Generate, win):
     round_list: list[Round] = []
 
     if DOWNLOAD_AUDIO:
-        download_videos(anime_list, AUDIO_DURATION, quality=96)
+        download_videos(anime_list, AUDIO_DURATION, quality=AUDIO_QUALITY)
         # normalize_audio()
         rounds_audio = create_rounds(anime_list[:], line_limit=10, per_line_limit=15, round_type='voice')
         round_list = round_list + rounds_audio
 
     if DOWNLOAD_SCREENSHOTS:
         asyncio.run(download_screenshots(anime_list))
-        compress_images()
+        if IMAGE_QUALITY!=100:
+            compress_images(IMAGE_QUALITY,COMPRESS_AFTER)
         rounds_scr = create_rounds(anime_list[:], line_limit=10, per_line_limit=15, round_type='image')
         round_list = round_list + rounds_scr
 
