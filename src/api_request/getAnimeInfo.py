@@ -3,18 +3,17 @@ import time
 import re
 
 import requests
-
-from src.downloader.fake_ua import random_ua
-
+from fake_useragent import UserAgent
 from src.entities.anime import Anime
 
-# API_URL="https://shikimori.me/api/"
+ua = UserAgent()
+
 API_URL = "https://shikimori.one/api/"
 
 
 def get_genres():
-    user_agent = {'User-Agent': f'{random_ua}'}
-    # user_agent = {'User-Agent': f'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'}
+
+    user_agent = {'User-Agent': ua.random}
     # return [genre["name"] for genre in requests.get("https://shikimori.me/api/genres",headers=user_agent,timeout=5).json() if genre["kind"]=="anime"]
     return [genre["name"] for genre in
             requests.get("https://shikimori.one/api/genres", headers=user_agent, timeout=5).json() if
@@ -36,16 +35,15 @@ def get_anime_desc(anime_list: list):
     ...
 
 
-headers = {'User-Agent': f'{random_ua}'}
 
 
-# headers = {'User-Agent': f'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'}
+
 def getAnimeIds(est_num, username, shuffle=True):
     anime_list = []
     anime_num = 0
     page = 1
     while anime_num < est_num:
-
+        headers = {'User-Agent': ua.random}
         data = {
             "page": page,
             "limit": 100,
@@ -94,6 +92,7 @@ def get_anime_info(anime_list: list):
     progress = 0
     for anime in anime_list:
         try:
+            headers = {'User-Agent': ua.random}
             animeInfo = requests.get(f"{API_URL}animes/{anime.id}", headers=headers).json()
             scr_url = random.choice(animeInfo["screenshots"])['original']
             result = re.search(r'[^/]+(?=\.)', scr_url)
@@ -108,6 +107,7 @@ def get_anime_info(anime_list: list):
         except requests.exceptions.HTTPError:
             time.sleep(20)
             print("API Request reached, waiting....")
+            headers = {'User-Agent': ua.random}
             animeInfo = requests.get(f"{API_URL}animes/{anime.id}", headers=headers).json()
             scr_url = random.choice(animeInfo["screenshots"])['original']
             result = re.search(r'[^/]+(?=\.)', scr_url)

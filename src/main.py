@@ -11,7 +11,6 @@ from src.entities.rounds import Round
 from src.generate import create_dirs
 from entities.generate import Generate
 from src.optimizer.compress_images import compress_images
-from src.optimizer.normalize_volume import normalize_audio
 from src.optimizer.sort_anime import sort_by_genres, force_sort_by_genres, sort_by_kind
 
 from entities.anime import Anime

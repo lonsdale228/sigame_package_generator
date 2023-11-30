@@ -8,7 +8,10 @@ import aiohttp as aiohttp
 from youtubesearchpython import VideosSearch
 from yt_dlp import YoutubeDL
 from src.entities.anime import Anime
-from src.downloader.fake_ua import random_ua
+
+from fake_useragent import UserAgent
+
+ua = UserAgent()
 
 scr_url = "https://shikimori.one/api/animes/%s/screenshots"
 
@@ -58,7 +61,7 @@ async def scr_download(anime: Anime):
 
         anime.scr_ext = scr_ext
 
-        headers = {'User-Agent': f'{random_ua}'}
+        headers = {'User-Agent': ua.random}
         async with aiohttp.ClientSession() as session:
             async with session.get(f"https://shikimori.one/system/screenshots/original/{anime_scr}",
                                    headers=headers) as response:

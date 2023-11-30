@@ -4,7 +4,7 @@ import re
 import time
 import requests
 from fake_useragent import UserAgent
-from src.downloader.fake_ua import random_ua
+
 API_URL="https://shikimori.me/api/"
 
 
