@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import pickle
 import random
 from api_request.getAnimeInfo import getAnimeIds, get_anime_info, remove_duplicates
@@ -62,6 +63,8 @@ def main(settings: Generate, win):
     DONT_USE_GENRES: bool = settings.dont_use_genres
 
     THREAD_NUM = settings.downloading_thread
+
+    start_time = datetime.datetime.now()
 
     win.set_progress(value=0)
 
@@ -160,8 +163,12 @@ def main(settings: Generate, win):
     create_package()
 
     clear_trash()
-    print("Done!")
+
+    total_time = datetime.datetime.now()-start_time
+    minutes = total_time.seconds // 60
+    seconds = total_time.seconds % 60
+    print(f"Done in {minutes} min and {seconds} sec!")
 
 
 if __name__ == "__main__":
-    ...
+    print("Run it throw gui!")
