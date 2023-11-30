@@ -114,22 +114,27 @@ def main(settings: Generate, win):
         else:
             anime_list = force_sort_by_genres(anime_list, req_genres)
 
-    # limit total anime count
-    anime_list: list[Anime] = anime_list[:ANIME_COUNT]
-
     round_list: list[Round] = []
 
     if DOWNLOAD_AUDIO:
-        download_videos(anime_list, AUDIO_DURATION, THREAD_NUM ,quality=AUDIO_QUALITY)
+        list_to_download = anime_list[:]
+        random.shuffle(list_to_download)
+        list_to_download = list_to_download[:ANIME_COUNT]
+
+        download_videos(list_to_download, AUDIO_DURATION, THREAD_NUM ,quality=AUDIO_QUALITY)
         # normalize_audio()
-        rounds_audio = create_rounds(anime_list[:], line_limit=10, per_line_limit=15, round_type='voice')
+        rounds_audio = create_rounds(list_to_download, line_limit=10, per_line_limit=15, round_type='voice')
         round_list = round_list + rounds_audio
 
     if DOWNLOAD_SCREENSHOTS:
-        asyncio.run(download_screenshots(anime_list))
+        list_to_download = anime_list[:]
+        random.shuffle(list_to_download)
+        list_to_download = list_to_download[:ANIME_COUNT]
+
+        asyncio.run(download_screenshots(list_to_download))
         if IMAGE_QUALITY!=100:
             compress_images(IMAGE_QUALITY,COMPRESS_AFTER)
-        rounds_scr = create_rounds(anime_list[:], line_limit=10, per_line_limit=15, round_type='image')
+        rounds_scr = create_rounds(list_to_download, line_limit=10, per_line_limit=15, round_type='image')
         round_list = round_list + rounds_scr
 
     if DESC_ROUND:
