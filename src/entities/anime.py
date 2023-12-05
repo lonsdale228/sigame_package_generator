@@ -42,3 +42,5 @@ class Anime:
     hex_name: str = None
     user_score: str = None
     franchise: str = None
+
+    characters: dict = None

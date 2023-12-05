@@ -119,6 +119,8 @@ def main(settings: Generate, win):
 
     round_list: list[Round] = []
 
+    thread_pool = []
+
     if DOWNLOAD_AUDIO:
         list_to_download = anime_list[:]
         random.shuffle(list_to_download)

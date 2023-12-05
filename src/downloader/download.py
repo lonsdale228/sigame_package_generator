@@ -58,7 +58,6 @@ async def scr_download(anime: Anime):
         anime_scr = random.choice(anime.screenshots)
         last_dot_index = anime_scr.rfind(".")
         scr_ext = anime_scr[last_dot_index:]
-
         anime.scr_ext = scr_ext
 
         headers = {'User-Agent': ua.random}
@@ -91,10 +90,12 @@ async def download_screenshots(animes):
 
     await asyncio.gather(*(download_and_track_progress(anime) for anime in animes))
 
+
 completed_downloads = 0
 lock = threading.Lock()
 
-def download_videos(anime_list, duration: int, thead_num: int = os.cpu_count() ,quality = 60):
+
+def download_videos(anime_list, duration: int, thead_num: int = os.cpu_count(), quality=60):
     print(f"Downloading {len(anime_list)} videos...")
     thread_list = []
     for anime in anime_list:
@@ -109,7 +110,8 @@ def download_videos(anime_list, duration: int, thead_num: int = os.cpu_count() ,
         ex.join()
     print("Downloaded!")
 
-def download_audio(anime, duration,list_len, quality):
+
+def download_audio(anime, duration, list_len, quality):
     global completed_downloads
 
     name = anime.name
@@ -135,7 +137,7 @@ def download_audio(anime, duration,list_len, quality):
     try:
         YoutubeDL(ydl_opts).download([url])
         with lock:
-            completed_downloads+=1
+            completed_downloads += 1
             print(f"Downloaded {completed_downloads}/{list_len} videos")
     except Exception as e:
         print(f"Error downloading {name}: {e}")
