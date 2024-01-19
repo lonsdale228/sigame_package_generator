@@ -1,10 +1,13 @@
 import asyncio
 import os
+import pickle
 import random
+import subprocess
 import threading
 import time
 import aiofiles as aiofiles
 import aiohttp as aiohttp
+import requests
 from youtubesearchpython import VideosSearch
 from yt_dlp import YoutubeDL
 from src.entities.anime import Anime
@@ -93,6 +96,72 @@ async def download_screenshots(animes):
 
 completed_downloads = 0
 lock = threading.Lock()
+
+
+class Anithemes:
+    sorted_list = []
+
+    no_audio_list = []
+
+    anime_audios_dict: dict = {}
+
+    def __init__(self, anime_list):
+        self.sort_list(anime_list)
+
+    def sort_list(self, anime_list: list[Anime]):
+        file = open('anime_audios.txt', 'rb')
+        self.anime_audios_dict = pickle.load(file)
+        file.close()
+
+        for anime in anime_list:
+            if anime.id in self.anime_audios_dict.keys():
+
+                if 'OP' in self.anime_audios_dict[anime.id]:
+                    anime.op_urls.append(self.anime_audios_dict[anime.id]['OP'])
+                if 'ED' in self.anime_audios_dict[anime.id]:
+                    anime.ed_urls.append(self.anime_audios_dict[anime.id]['ED'])
+
+                self.sorted_list.append(anime)
+            else:
+                self.no_audio_list.append(anime)
+
+    def anithemes_download(self, thread_num: int, quality: int = 96, audio_type='OP'):
+        thread_pool = []
+        for anime in self.sorted_list:
+
+            url = random.choice(anime.op_urls if audio_type == 'OP' else anime.ed_urls)
+            thread = threading.Thread(target=self.anithemes_download_audio(url, audio_type, anime))
+            thread_pool.append(thread)
+            thread.start()
+
+            while threading.active_count() > thread_num:
+                time.sleep(1)
+
+    def anithemes_download_audio(self, url: str, audio_type: str, anime: Anime):
+        start_time = 0
+        end_time = 30
+
+        download_dir = 'temp/Audio/'
+
+        response = requests.get(f'https://v.animethemes.moe/{url}')
+
+        if response.status_code == 200:
+            with open("video.mp4", "wb") as video_file:
+                video_file.write(response.content)
+
+            output_filename = download_dir + anime.hex_name + '_' + audio_type + ".mp3"
+            subprocess.run(['ffmpeg/ffmpeg.exe',
+                            '-i', 'video.mp4',
+                            '-ss', '00:00:00',
+                            '-t', f'{end_time}',
+                            '-c:a', 'libmp3lame',
+                            '-b:a', f'{96}k',
+                            output_filename
+                            ])
+
+            print(f"Downloaded and trimmed video to {output_filename}")
+        else:
+            print("Failed to download the video.")
 
 
 def download_videos(anime_list, duration: int, thead_num: int = os.cpu_count(), quality=60):

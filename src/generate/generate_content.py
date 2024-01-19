@@ -68,11 +68,22 @@ def create_lines(animes: list[Anime], questions_per_line=15, round_type=''):
                     temp_line.questions.append(temp_question)
                     animes.pop(0)
                 line_list.append(temp_line)
-
+            case 'text':
+                for i in range(questions_per_line + 1):
+                    if len(animes) == 0:
+                        break
+                    temp_question = Question()
+                    temp_question.price = 100
+                    temp_question.type = round_type
+                    temp_question.answer = animes[0].name + " / " + animes[0].name_rus
+                    temp_question.desc = animes[0].description
+                    temp_line.questions.append(temp_question)
+                    animes.pop(0)
+                line_list.append(temp_line)
     return line_list
 
 
-def create_rounds(animes, line_limit, per_line_limit , round_type):
+def create_rounds(animes, line_limit, per_line_limit, round_type):
     line_name = "Default"
     round_name = "Default round"
     match round_type:
@@ -82,6 +93,9 @@ def create_rounds(animes, line_limit, per_line_limit , round_type):
         case 'image':
             round_name = "Screenshots"
             line_name = 'Screenshots'
+        case 'text':
+            round_name = 'Descriptions'
+            line_name = 'Description'
 
     line_list = create_lines(animes, per_line_limit, round_type)
     for i, line in enumerate(line_list):
@@ -183,7 +197,13 @@ def create_xml_rounds(round_list: list, shuffle_lines: bool = True, shuffle_ques
                 for question in line.questions:
                     xml_que = ET.SubElement(xml_questions, "question", price=f"{question.price}")
                     xml_scenario = ET.SubElement(xml_que, "scenario")
-                    xml_atom_type = ET.SubElement(xml_scenario, "atom", type=f"{question.type}")
+
+                    if question.type == 'text':
+                        xml_atom_text = ET.SubElement(xml_scenario, "atom")
+                        xml_atom_text.text = question.desc
+                        xml_atom_type = ET.SubElement(xml_scenario, "atom", type="content")
+                    else:
+                        xml_atom_type = ET.SubElement(xml_scenario, "atom", type=f"{question.type}")
                     match question.type:
                         case "voice":
                             xml_atom_type.text = "@" + question.hex + ".mp3"

@@ -12,6 +12,7 @@ from src.entities.rounds import Round
 from src.generate import create_dirs
 from entities.generate import Generate
 from src.optimizer.compress_images import compress_images
+from src.optimizer.description_round import clear_description
 from src.optimizer.sort_anime import sort_by_genres, force_sort_by_genres, sort_by_kind
 
 from entities.anime import Anime
@@ -46,7 +47,6 @@ def main(settings: Generate, win):
     REMOVE_FRANCHISE_REPEAT: bool = settings.remove_duplicates
     SHUFFLE_LINES: bool = settings.shuffle_lines
     SHUFFLE_QUESTIONS: bool = settings.shuffle_questions
-
 
     NICKNAME: str = settings.nickname
 
@@ -119,17 +119,16 @@ def main(settings: Generate, win):
 
     round_list: list[Round] = []
 
-    thread_pool = []
-
     if DOWNLOAD_AUDIO:
         list_to_download = anime_list[:]
         random.shuffle(list_to_download)
         list_to_download = list_to_download[:ANIME_COUNT]
 
-        download_videos(list_to_download, AUDIO_DURATION, THREAD_NUM ,quality=AUDIO_QUALITY)
+        download_videos(list_to_download, AUDIO_DURATION, THREAD_NUM, quality=AUDIO_QUALITY)
         # normalize_audio()
         rounds_audio = create_rounds(list_to_download, line_limit=10, per_line_limit=15, round_type='voice')
         round_list = round_list + rounds_audio
+        del list_to_download
 
     if DOWNLOAD_SCREENSHOTS:
         list_to_download = anime_list[:]
@@ -137,13 +136,20 @@ def main(settings: Generate, win):
         list_to_download = list_to_download[:ANIME_COUNT]
 
         asyncio.run(download_screenshots(list_to_download))
-        if IMAGE_QUALITY!=100:
-            compress_images(IMAGE_QUALITY,COMPRESS_AFTER)
+        if IMAGE_QUALITY != 100:
+            compress_images(IMAGE_QUALITY, COMPRESS_AFTER)
         rounds_scr = create_rounds(list_to_download, line_limit=10, per_line_limit=15, round_type='image')
         round_list = round_list + rounds_scr
+        del list_to_download
 
     if DESC_ROUND:
-        ...
+        list_to_download = anime_list[:]
+        random.shuffle(list_to_download)
+        list_to_download = list_to_download[:ANIME_COUNT]
+        clear_description(list_to_download)
+        rounds_desc = create_rounds(list_to_download, line_limit=10, per_line_limit=15, round_type='text')
+        round_list = round_list + rounds_desc
+        del list_to_download
 
     if GPT_ROUND:
         ...
@@ -156,17 +162,16 @@ def main(settings: Generate, win):
         if a.franchise in repeat_test:
             repeated.append(a)
         repeat_test.append(a.franchise)
-
     print("Anime repeates: ", len(repeated))
 
+    # creating xml and cleaning trash
     create_xml(round_list, NICKNAME)
-
     transfer_audio()
     create_package()
-
     clear_trash()
 
-    total_time = datetime.datetime.now()-start_time
+    # execution time
+    total_time = datetime.datetime.now() - start_time
     minutes = total_time.seconds // 60
     seconds = total_time.seconds % 60
     print(f"Done in {minutes} min and {seconds} sec!")

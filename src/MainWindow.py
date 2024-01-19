@@ -136,7 +136,7 @@ class Ui_MainWindow(object):
         self.cbCharactersRound.setObjectName("cbCharactersRound")
         self.verticalLayout_5.addWidget(self.cbCharactersRound)
         self.cbDescRound = QtWidgets.QCheckBox(parent=self.verticalLayoutWidget_5)
-        self.cbDescRound.setEnabled(False)
+        self.cbDescRound.setEnabled(True)
         self.cbDescRound.setChecked(False)
         self.cbDescRound.setObjectName("cbDescRound")
         self.verticalLayout_5.addWidget(self.cbDescRound)

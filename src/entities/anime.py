@@ -16,6 +16,7 @@
 
 
 class Anime:
+
     id: int = None
 
     mal_id: int = None
@@ -44,3 +45,6 @@ class Anime:
     franchise: str = None
 
     characters: dict = None
+
+    op_urls: list = []
+    ed_urls: list = []
